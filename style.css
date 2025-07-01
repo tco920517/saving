@@ -1,0 +1,32 @@
+body {
+  font-family: "Arial", sans-serif;
+  background-color: #e5ddd5;
+  margin: 0;
+  padding: 0;
+}
+
+.chat-container {
+  max-width: 500px;
+  margin: 50px auto;
+  padding: 10px;
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.chat-bubble {
+  max-width: 80%;
+  padding: 12px 15px;
+  margin: 10px;
+  border-radius: 18px;
+  font-size: 16px;
+  line-height: 1.5;
+  word-wrap: break-word;
+  position: relative;
+}
+
+.admin {
+  background-color: #dcf8c6;
+  align-self: flex-start;
+  margin-left: 10px;
+}
