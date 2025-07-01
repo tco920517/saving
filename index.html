@@ -129,8 +129,6 @@
 <body>
 <div class="page-title">
 <div class="main-title">뉴스 시사 라이브 달글 부속</div><br/>
-<div class="sub-title">댓관용 날조 정정 자료</div>
-<div class="sub-title">박찬대 당대표 후보 밭갈이용 정보 모음 💙<br/><br/></div>
 <div class="sub-title"><span style="font-size: 12px; color: #777;">💡 → 날조 사실에 대한 팩트 정리</span></div>
 <div class="sub-title"><span style="font-size: 12px; color: #777;">🔵 → 박찬대 당대표 후보 밭갈이용</span></div>
 <div class="sub-title"><span style="font-size: 12px; color: #777;">🔔 → 참고하면 좋은 정보</span></div><div class="search-bar">
@@ -276,6 +274,7 @@ async function loadMessages() {
 
     container.appendChild(bubble);
   });
+  container.scrollTop = container.scrollHeight;
 }
 
 async function addOrUpdateMessage() {
