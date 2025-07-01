@@ -1,5 +1,6 @@
 
 <!DOCTYPE html>
+
 <html lang="ko">
 <head>
 <meta charset="utf-8"/>
@@ -146,6 +147,7 @@
 <button onclick="addOrUpdateMessage()">내용 추가</button>
 </div>
 <div id="toast">📋 복사</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
@@ -182,80 +184,74 @@ async function loadMessages() {
 
     const bubble = document.createElement("div");
     bubble.className = "chat-bubble";
-    bubble.innerHTML = `
-      <div class="chat-content preview">
-        <div class="inner-text" contenteditable="false">${msg.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>').replace(/\n/g, '<br>')}</div>
-        <div class="copy-button" style="display:none; font-size:12px; color:#007bff; text-align:right; cursor:pointer;">복사하기</div>
-<div class="toggle-more" style="text-align:right; font-size:12px; color:gray; cursor:pointer;">더보기</div>
-      </div>
-      <div class="timestamp">${dateOnly}</div>
-    `;
+    bubble.style.userSelect = "none";
+    bubble.style.webkitUserSelect = "none";
+    bubble.style.webkitTouchCallout = "none";
 
-    
+    const contentDiv = document.createElement("div");
+    contentDiv.className = "chat-content preview";
 
-const copyBtn = bubble.querySelector('.copy-button');
-bubble.addEventListener("touchstart", function(e) {
-  pressTimer = setTimeout(() => {
-    copyBtn.style.display = 'block';
-  }, 500);
-});
-bubble.addEventListener("touchend", function(e) {
-  clearTimeout(pressTimer);
-});
-copyBtn.addEventListener("click", function(e) {
-  e.stopPropagation();
-  navigator.clipboard.writeText(msg).then(() => {
-    copyBtn.style.display = 'none';
-    const toast = document.getElementById("toast");
-    toast.style.display = "block";
-    setTimeout(() => toast.style.display = "none", 1500);
-  });
-});
+    const inner = document.createElement("div");
+    inner.className = "inner-text";
+    inner.innerHTML = msg.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>').replace(/\n/g, '<br>');
+    inner.style.userSelect = "none";
+    inner.style.webkitUserSelect = "none";
 
-let pressTimer;
-const innerText = bubble.querySelector('.inner-text');
-innerText.addEventListener("click", (e) => {
-  if (!/Mobi|Android/i.test(navigator.userAgent)) {
-    e.stopPropagation();
-    navigator.clipboard.writeText(msg).then(() => {
-      const toast = document.getElementById("toast");
-      toast.style.display = "block";
-      setTimeout(() => toast.style.display = "none", 1500);
-    });
-
-let pressTimer;
-bubble.addEventListener("touchstart", function(e) {
-  pressTimer = setTimeout(() => {
-    navigator.clipboard.writeText(msg).then(() => {
-      const toast = document.getElementById("toast");
-      toast.style.display = "block";
-      setTimeout(() => toast.style.display = "none", 1500);
-    });
-  }, 500);
-});
-
-bubble.addEventListener("touchend", function(e) {
-  clearTimeout(pressTimer);
-});
-
-  }
-});
-
-const toggle = bubble.querySelector('.toggle-more');
-    const content = bubble.querySelector('.chat-content');
-    toggle.addEventListener('click', (event) => {
-      event.stopPropagation();
-      content.classList.toggle('expanded');
-      toggle.textContent = content.classList.contains('expanded') ? '줄임' : '더보기';
-    });
-
-    bubble.addEventListener("click", () => {
-      navigator.clipboard.writeText(msg).then(() => {
+    function copyTextToClipboard(text) {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.setAttribute("readonly", "");
+      textarea.style.position = "absolute";
+      textarea.style.left = "-9999px";
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand("copy");
         const toast = document.getElementById("toast");
         toast.style.display = "block";
         setTimeout(() => toast.style.display = "none", 1500);
-      });
+      } catch (err) {
+        console.error("복사 실패", err);
+      }
+      document.body.removeChild(textarea);
+    }
+
+    // PC 클릭 복사
+    inner.addEventListener("click", () => {
+      if (!/Mobi|Android/i.test(navigator.userAgent)) {
+        copyTextToClipboard(msg);
+      }
     });
+
+    // 모바일 롱탭 복사
+    let pressTimer;
+    bubble.addEventListener("touchstart", () => {
+      pressTimer = setTimeout(() => {
+        copyTextToClipboard(msg);
+      }, 600);
+    });
+    bubble.addEventListener("touchend", () => {
+      clearTimeout(pressTimer);
+    });
+
+    const toggle = document.createElement("div");
+    toggle.className = "toggle-more";
+    toggle.textContent = "더보기";
+    toggle.style.cssText = "text-align:right; font-size:12px; color:gray; cursor:pointer;";
+    toggle.addEventListener("click", (event) => {
+      event.stopPropagation();
+      contentDiv.classList.toggle("expanded");
+      toggle.textContent = contentDiv.classList.contains("expanded") ? "줄임" : "더보기";
+    });
+
+    contentDiv.appendChild(inner);
+    contentDiv.appendChild(toggle);
+    bubble.appendChild(contentDiv);
+
+    const tsDiv = document.createElement("div");
+    tsDiv.className = "timestamp";
+    tsDiv.textContent = dateOnly;
+    bubble.appendChild(tsDiv);
 
     if (isAdmin) {
       const btns = document.createElement("div");
@@ -278,34 +274,7 @@ const toggle = bubble.querySelector('.toggle-more');
       bubble.appendChild(btns);
     }
 
-    
-const contentBox = bubble.querySelector(".inner-text");
-
-if (!/Mobi|Android/i.test(navigator.userAgent)) {
-  contentBox.addEventListener("click", () => {
-    navigator.clipboard.writeText(msg).then(() => {
-      const toast = document.getElementById("toast");
-      toast.style.display = "block";
-      setTimeout(() => toast.style.display = "none", 1500);
-    });
-  });
-} else {
-  let pressTimer;
-  bubble.addEventListener("touchstart", () => {
-    pressTimer = setTimeout(() => {
-      navigator.clipboard.writeText(msg).then(() => {
-        const toast = document.getElementById("toast");
-        toast.style.display = "block";
-        setTimeout(() => toast.style.display = "none", 1500);
-      });
-    }, 500);
-  });
-  bubble.addEventListener("touchend", () => {
-    clearTimeout(pressTimer);
-  });
-}
-
-        container.appendChild(bubble);
+    container.appendChild(bubble);
   });
 }
 
@@ -349,6 +318,5 @@ window.addOrUpdateMessage = addOrUpdateMessage;
 window.showPasswordPrompt = showPasswordPrompt;
 window.filterMessages = filterMessages;
 window.onload = loadMessages;
-</script>
-</body>
+</script></body>
 </html>
