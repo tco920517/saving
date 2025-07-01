@@ -168,7 +168,7 @@
         const bubble = document.createElement("div");
         bubble.className = "chat-bubble";
         bubble.innerHTML = `
-          <div>${msg.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>')}</div>
+          <div>${msg.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>').replace(/\n/g, '<br>')}</div>
           <div class="timestamp">${dateOnly}</div>
         `;
 
