@@ -1,18 +1,18 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>공지 대화창</title>
+  <title>공지 대화창 (모바일 복사 완전 대응)</title>
   <style>
     body {
-      font-family: "맑은 고딕", "Malgun Gothic", sans-serif;
-      background-color: #f0f2f5;
+      font-family: "Malgun Gothic", "맑은 고딕", sans-serif;
+      background-color: #f2f5f8;
       margin: 0;
       padding: 0;
-      font-size: 15px;
+      font-size: 14px;
     }
-
     .page-title {
       max-width: 700px;
       margin: 30px auto 20px;
@@ -23,7 +23,6 @@
       white-space: pre-line;
       line-height: 1.6;
     }
-
     .chat-container {
       max-width: 500px;
       margin: 0 auto;
@@ -32,32 +31,31 @@
       border-radius: 15px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     }
-
     .chat-bubble {
       max-width: 80%;
       padding: 10px 14px;
       margin: 10px;
       border-radius: 18px;
-      font-size: 15px;
+      font-size: 14px;
       line-height: 1.5;
       word-wrap: break-word;
-      position: relative;
       background-color: #ffffff;
       border: 1px solid #dcdcdc;
+      position: relative;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
     }
-
     .bubble-buttons {
       display: none;
       font-size: 12px;
       margin-top: 6px;
     }
-
     .search-bar {
       max-width: 500px;
       margin: 20px auto 10px;
       text-align: center;
     }
-
     .search-bar input {
       width: 100%;
       padding: 8px 12px;
@@ -65,13 +63,11 @@
       border: 1px solid #ccc;
       border-radius: 8px;
     }
-
     #input-area {
       text-align: center;
       margin: 30px auto;
       max-width: 500px;
     }
-
     textarea {
       width: 100%;
       padding: 8px;
@@ -79,7 +75,6 @@
       font-size: 14px;
       border: 1px solid #aaa;
     }
-
     button {
       margin-top: 10px;
       padding: 6px 12px;
@@ -90,16 +85,13 @@
       color: white;
       cursor: pointer;
     }
-
     button:hover {
       background-color: #888;
     }
-
     a {
       color: #0077cc;
       text-decoration: underline;
     }
-
     #toast {
       display: none;
       position: fixed;
@@ -118,21 +110,12 @@
 </head>
 <body>
   <div class="page-title">
-    [여성시대] 뉴스 시사 라이브 달글 부속  
-    / 댓관용 날조 정정 자료  
-    / 박찬대 당대표 후보 밭갈이용 정보 모음 💙
+    [여성시대] 뉴스 시사 라이브 달글 부속<br>
+    댓관용 날조 정정 자료<br>
+    박찬대 당대표 후보 밭갈이용 정보 모음 💙
   </div>
 
-  <div class="chat-container" id="chatBox">
-    <!-- 초기 말풍선 예시 (원하시면 삭제 가능) -->
-    <div class="chat-bubble">
-      <div class="content">📢 오늘 오후 3시에 공지사항이 올라옵니다.</div>
-      <div class="bubble-buttons">
-        <button onclick="editMessage(this)">수정</button>
-        <button onclick="deleteMessage(this)">삭제</button>
-      </div>
-    </div>
-  </div>
+  <div class="chat-container" id="chatBox"></div>
 
   <div class="search-bar">
     <input type="text" id="searchInput" placeholder="공지 내용 검색..." oninput="filterMessages()" />
@@ -145,111 +128,123 @@
   <div id="input-area" style="display:none;">
     <textarea id="newMessage" rows="3" placeholder="공지 입력..."></textarea>
     <br />
-    <button onclick="addMessage()">공지 추가</button>
+    <button onclick="addOrUpdateMessage()">공지 추가</button>
   </div>
 
   <div id="toast">📋 복사되었습니다</div>
 
   <script>
-    const PASSWORD = "1234";
+    let editingIndex = null;
     let isAdmin = false;
-    let editingBubble = null;
+
+    function getMessages() {
+      return JSON.parse(localStorage.getItem('messages') || '[]');
+    }
+
+    function saveMessages(messages) {
+      localStorage.setItem('messages', JSON.stringify(messages));
+    }
+
+    function renderMessages() {
+      const container = document.getElementById("chatBox");
+      container.innerHTML = "";
+      const messages = getMessages();
+      messages.forEach((msg, index) => {
+        const bubble = document.createElement("div");
+        bubble.className = "chat-bubble";
+        bubble.innerHTML = msg.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
+
+        function copyContent() {
+          navigator.clipboard.writeText(msg).then(() => {
+            const toast = document.getElementById("toast");
+            toast.style.display = "block";
+            setTimeout(() => toast.style.display = "none", 1500);
+          });
+        }
+
+        // PC 클릭
+        bubble.addEventListener("click", copyContent);
+
+        // 모바일 롱프레스
+        let pressTimer = null;
+        bubble.addEventListener("touchstart", (e) => {
+          e.preventDefault(); // 기본 텍스트 선택 막기
+          pressTimer = setTimeout(() => {
+            copyContent();
+          }, 600);
+        });
+        bubble.addEventListener("touchend", (e) => {
+          clearTimeout(pressTimer);
+        });
+        bubble.addEventListener("touchmove", (e) => {
+          clearTimeout(pressTimer);
+        });
+
+        if (isAdmin) {
+          const btns = document.createElement("div");
+          btns.className = "bubble-buttons";
+          btns.style.display = "block";
+
+          const editBtn = document.createElement("button");
+          editBtn.textContent = "수정";
+          editBtn.onclick = () => {
+            document.getElementById("newMessage").value = msg;
+            editingIndex = index;
+          };
+
+          const delBtn = document.createElement("button");
+          delBtn.textContent = "삭제";
+          delBtn.onclick = () => {
+            messages.splice(index, 1);
+            saveMessages(messages);
+            renderMessages();
+          };
+
+          btns.appendChild(editBtn);
+          btns.appendChild(delBtn);
+          bubble.appendChild(btns);
+        }
+
+        container.appendChild(bubble);
+      });
+    }
+
+    function addOrUpdateMessage() {
+      const content = document.getElementById("newMessage").value.trim();
+      if (!content) return;
+      let messages = getMessages();
+      if (editingIndex !== null) {
+        messages[editingIndex] = content;
+        editingIndex = null;
+      } else {
+        messages.unshift(content);
+      }
+      saveMessages(messages);
+      document.getElementById("newMessage").value = "";
+      renderMessages();
+    }
 
     function showPasswordPrompt() {
-      const input = prompt("비밀번호를 입력하세요:");
-      if (input === PASSWORD) {
+      const pwd = prompt("관리자 비밀번호를 입력하세요");
+      if (pwd === "1234") {
         isAdmin = true;
         document.getElementById("input-area").style.display = "block";
-        document.getElementById("admin-panel").style.display = "none";
-        document.querySelectorAll(".bubble-buttons").forEach(btn => btn.style.display = "block");
+        renderMessages();
       } else {
         alert("비밀번호가 틀렸습니다.");
       }
     }
 
-    function linkify(text) {
-      const urlPattern = /(https?:\/\/[^\s]+)/g;
-      return text.replace(urlPattern, (url) => {
-        return `<a href="${url}" target="_blank">${url}</a>`;
-      });
-    }
-
-    function addMessage() {
-      const msg = document.getElementById("newMessage").value.trim();
-      if (msg === "") return;
-
-      if (editingBubble) {
-        editingBubble.querySelector(".content").innerHTML = linkify(msg);
-        editingBubble = null;
-        document.querySelector("button[onclick='addMessage()']").innerText = "공지 추가";
-      } else {
-        const chatBox = document.getElementById("chatBox");
-        const bubble = document.createElement("div");
-        bubble.className = "chat-bubble";
-        bubble.innerHTML = `
-          <div class="content">${linkify(msg)}</div>
-          <div class="bubble-buttons" style="display: ${isAdmin ? "block" : "none"}">
-            <button onclick="editMessage(this)">수정</button>
-            <button onclick="deleteMessage(this)">삭제</button>
-          </div>`;
-        addCopyListeners(bubble);
-        chatBox.appendChild(bubble);
-      }
-
-      document.getElementById("newMessage").value = "";
-    }
-
-    function editMessage(btn) {
-      const bubble = btn.closest(".chat-bubble");
-      const text = bubble.querySelector(".content").innerText;
-      document.getElementById("newMessage").value = text;
-      editingBubble = bubble;
-      document.querySelector("button[onclick='addMessage()']").innerText = "수정 완료";
-    }
-
-    function deleteMessage(btn) {
-      const bubble = btn.closest(".chat-bubble");
-      bubble.remove();
-    }
-
-    function addCopyListeners(element) {
-      let touchTimer;
-      element.addEventListener("touchstart", () => {
-        touchTimer = setTimeout(() => {
-          const temp = document.createElement("textarea");
-          temp.value = element.querySelector(".content").innerText;
-          document.body.appendChild(temp);
-          temp.select();
-          document.execCommand("copy");
-          document.body.removeChild(temp);
-          showToast("📋 복사되었습니다");
-        }, 600);
-      });
-      element.addEventListener("touchend", () => {
-        clearTimeout(touchTimer);
-      });
-    }
-
-    // 초기 말풍선에도 복사 기능 적용
-    document.querySelectorAll(".chat-bubble").forEach(addCopyListeners);
-
-    function showToast(msg) {
-      const toast = document.getElementById("toast");
-      toast.innerText = msg;
-      toast.style.display = "block";
-      setTimeout(() => {
-        toast.style.display = "none";
-      }, 2000);
-    }
-
     function filterMessages() {
-      const keyword = document.getElementById("searchInput").value.toLowerCase();
+      const query = document.getElementById("searchInput").value.toLowerCase();
       const bubbles = document.querySelectorAll(".chat-bubble");
-      bubbles.forEach((bubble) => {
-        const text = bubble.innerText.toLowerCase();
-        bubble.style.display = text.includes(keyword) ? "block" : "none";
+      bubbles.forEach(b => {
+        const text = b.textContent.toLowerCase();
+        b.style.display = text.includes(query) ? "block" : "none";
       });
     }
+
+    renderMessages();
   </script>
 </body>
 </html>
