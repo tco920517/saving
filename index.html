@@ -1,11 +1,12 @@
 
 <!DOCTYPE html>
+
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>[여성시대] 뉴스 시사 라이브 달글 부속</title>
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>[여성시대] 뉴스 시사 라이브 달글 부속</title>
+<style>
     body {
       font-family: "Malgun Gothic", sans-serif;
       background-color: #f2f5f8;
@@ -29,6 +30,8 @@
       font-weight: normal;
     }
     .chat-container {
+  height: 600px;
+  overflow-y: auto;
       max-width: 500px;
       margin: 0 auto;
       padding: 10px;
@@ -101,37 +104,42 @@
       opacity: 0.9;
       z-index: 1000;
     }
-  </style>
+  
+.chat-content.preview .inner-text {
+  max-height: 4.5em;
+  overflow: hidden;
+}
+.chat-content.expanded .inner-text {
+  max-height: none;
+}
+.chat-content .inner-text {
+  transition: max-height 0.3s ease;
+}
+</style>
 </head>
 <body>
-  <div class="page-title">
-    <div class="main-title">뉴스 시사 라이브 달글 부속</div><br>
-    <div class="sub-title">댓관용 날조 정정 자료</div>
-    <div class="sub-title">박찬대 당대표 후보 밭갈이용 정보 모음 💙<br><br></div>
-    <div class="sub-title"><span style="font-size: 12px; color: #777;">💡 → 날조 사실에 대한 팩트 정리</span></div>
-    <div class="sub-title"><span style="font-size: 12px; color: #777;">🔵 → 박찬대 당대표 후보 밭갈이용</span></div>
-    <div class="sub-title"><span style="font-size: 12px; color: #777;">🔔 → 참고하면 좋은 정보</span></div>
-  </div>
-
-  <div class="chat-container" id="chatBox"></div>
-
-  <div class="search-bar">
-    <input type="text" id="searchInput" placeholder="검색" oninput="filterMessages()" />
-  </div>
-
-  <div id="admin-panel">
-    <button onclick="showPasswordPrompt()">🔒 달주 전용</button>
-  </div>
-
-  <div id="input-area" style="display:none;">
-    <textarea id="newMessage" rows="3" placeholder="내용"></textarea>
-    <br />
-    <button onclick="addOrUpdateMessage()">내용 추가</button>
-  </div>
-
-  <div id="toast">📋 복사</div>
-
-  <script type="module">
+<div class="page-title">
+<div class="main-title">뉴스 시사 라이브 달글 부속</div><br/>
+<div class="sub-title">댓관용 날조 정정 자료</div>
+<div class="sub-title">박찬대 당대표 후보 밭갈이용 정보 모음 💙<br/><br/></div>
+<div class="sub-title"><span style="font-size: 12px; color: #777;">💡 → 날조 사실에 대한 팩트 정리</span></div>
+<div class="sub-title"><span style="font-size: 12px; color: #777;">🔵 → 박찬대 당대표 후보 밭갈이용</span></div>
+<div class="sub-title"><span style="font-size: 12px; color: #777;">🔔 → 참고하면 좋은 정보</span></div>
+</div>
+<div class="chat-container" id="chatBox"></div>
+<div class="search-bar">
+<input id="searchInput" oninput="filterMessages()" placeholder="검색" type="text"/>
+</div>
+<div id="admin-panel">
+<button onclick="showPasswordPrompt()">🔒 달주 전용</button>
+</div>
+<div id="input-area" style="display:none;">
+<textarea id="newMessage" placeholder="내용" rows="3"></textarea>
+<br>
+<button onclick="addOrUpdateMessage()">내용 추가</button>
+</br></div>
+<div id="toast">📋 복사</div>
+<script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import {
       getFirestore, collection, getDocs, addDoc, deleteDoc, updateDoc,
@@ -168,7 +176,10 @@
         const bubble = document.createElement("div");
         bubble.className = "chat-bubble";
         bubble.innerHTML = `
-          <div>${msg.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>').replace(/\n/g, '<br>')}</div>
+          <div class="chat-content preview">
+      <div class="inner-text">${msg.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>').replace(/\n/g, '<br>')}</div>
+      <div class="toggle-more" style="text-align:right; font-size:12px; color:gray; cursor:pointer;">더보기</div>
+    </div>
           <div class="timestamp">${dateOnly}</div>
         `;
 
@@ -247,6 +258,17 @@
     window.showPasswordPrompt = showPasswordPrompt;
     window.filterMessages = filterMessages;
     window.onload = loadMessages;
-  </script>
+  
+
+    setTimeout(() => {
+      document.querySelectorAll('.chat-content').forEach(box => {
+        const toggle = box.querySelector('.toggle-more');
+        toggle.addEventListener('click', () => {
+          box.classList.toggle('expanded');
+          toggle.textContent = box.classList.contains('expanded') ? '줄임' : '더보기';
+        });
+      });
+    }, 500);
+    </script>
 </body>
 </html>
