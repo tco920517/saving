@@ -111,7 +111,6 @@
 </head>
 <body>
   <div class="page-title">
-    [여성시대] 뉴스 시사 라이브 달글 부속<br>
     댓관용 날조 정정 자료<br>
     박찬대 당대표 후보 밭갈이용 정보 모음 💙
   </div>
@@ -119,11 +118,11 @@
   <div class="chat-container" id="chatBox"></div>
 
   <div class="search-bar">
-    <input type="text" id="searchInput" placeholder="공지 내용 검색..." oninput="filterMessages()" />
+    <input type="text" id="searchInput" placeholder="검색..." oninput="filterMessages()" />
   </div>
 
   <div id="admin-panel" style="text-align: center;">
-    <button onclick="showPasswordPrompt()">🔒 관리자 전용</button>
+    <button onclick="showPasswordPrompt()">🔒 달주 전용</button>
   </div>
 
   <div id="input-area" style="display:none;">
@@ -214,7 +213,7 @@
     }
 
     function showPasswordPrompt() {
-      const pwd = prompt("관리자 비밀번호를 입력하세요");
+      const pwd = prompt("비밀번호를 입력하세요");
       if (pwd === "980324") {
         isAdmin = true;
         document.getElementById("input-area").style.display = "block";
@@ -330,7 +329,7 @@
     }
 
     function showPasswordPrompt() {
-      const pwd = prompt("관리자 비밀번호를 입력하세요");
+      const pwd = prompt("비밀번호를 입력하세요");
       if (pwd === "980324") {
         isAdmin = true;
         document.getElementById("input-area").style.display = "block";
