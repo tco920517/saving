@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>공지 대화창 (모바일 복사 완전 대응)</title>
+  <title>공지 대화창 (모바일 클릭 복사 안정 버전)</title>
   <style>
     body {
       font-family: "Malgun Gothic", "맑은 고딕", sans-serif;
@@ -45,6 +45,7 @@
       user-select: none;
       -webkit-user-select: none;
       -webkit-touch-callout: none;
+      cursor: pointer;
     }
     .bubble-buttons {
       display: none;
@@ -159,26 +160,14 @@
             const toast = document.getElementById("toast");
             toast.style.display = "block";
             setTimeout(() => toast.style.display = "none", 1500);
+          }).catch(err => {
+            alert("복사에 실패했습니다: " + err);
           });
         }
 
-        // PC 클릭
+        // PC + 모바일 클릭 이벤트로만 처리
         bubble.addEventListener("click", copyContent);
-
-        // 모바일 롱프레스
-        let pressTimer = null;
-        bubble.addEventListener("touchstart", (e) => {
-          e.preventDefault(); // 기본 텍스트 선택 막기
-          pressTimer = setTimeout(() => {
-            copyContent();
-          }, 600);
-        });
-        bubble.addEventListener("touchend", (e) => {
-          clearTimeout(pressTimer);
-        });
-        bubble.addEventListener("touchmove", (e) => {
-          clearTimeout(pressTimer);
-        });
+        bubble.addEventListener("touchend", copyContent);
 
         if (isAdmin) {
           const btns = document.createElement("div");
