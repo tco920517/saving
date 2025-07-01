@@ -4,53 +4,129 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>공지 페이지</title>
+  <title>[여성시대] 뉴스 시사 라이브 달글 부속</title>
   <style>
     body {
       font-family: "Malgun Gothic", sans-serif;
-      background-color: #f0f4f8;
-      padding: 20px;
+      background-color: #f2f5f8;
       margin: 0;
+      padding: 0;
+      font-size: 14px;
     }
-    h1 {
-      font-size: 22px;
+    .page-title {
+      max-width: 700px;
+      margin: 30px auto 20px;
+      text-align: center;
+      padding: 0 15px;
+      line-height: 1.6;
+    }
+    .page-title .main-title {
+      font-size: 21px;
       font-weight: bold;
-      margin-bottom: 10px;
+    }
+    .page-title .sub-title {
+      font-size: 13px;
+      font-weight: normal;
     }
     .chat-container {
-      background: #e6f3ff;
-      border-radius: 10px;
-      padding: 20px;
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 10px;
+      background-color: #e0f3ff;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     }
     .chat-bubble {
-      background: white;
-      border-radius: 10px;
-      padding: 10px 15px;
-      margin: 10px 0;
+      max-width: 80%;
+      padding: 10px 14px;
+      margin: 10px auto;
+      border-radius: 18px;
+      font-size: 14px;
+      line-height: 1.5;
+      word-wrap: break-word;
+      background-color: #ffffff;
+      border: 1px solid #dcdcdc;
       position: relative;
+      user-select: none;
+      cursor: pointer;
     }
-    .chat-bubble:hover {
-      background-color: #f9f9f9;
+    .timestamp {
+      font-size: 12px;
+      color: #888;
+      text-align: right;
+      margin-top: 4px;
     }
-    .admin-controls {
+    .bubble-buttons {
       display: none;
-      margin-top: 5px;
-    }
-    .chat-bubble.admin .admin-controls {
-      display: block;
       font-size: 12px;
+      margin-top: 6px;
+      text-align: right;
     }
-    .admin-controls button {
-      margin-right: 5px;
-      font-size: 12px;
+    .search-bar, #input-area, #admin-panel {
+      max-width: 500px;
+      margin: 20px auto;
+      text-align: center;
     }
-    .input-section {
-      margin-top: 20px;
+    .search-bar input, textarea {
+      width: 100%;
+      padding: 8px 12px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
     }
-    input, textarea, button {
-      font-family: "Malgun Gothic", sans-serif;
+    button {
+      margin-top: 10px;
+      padding: 6px 12px;
+      font-size: 14px;
+      border-radius: 8px;
+      border: none;
+      background-color: #aaa;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #888;
+    }
+    #toast {
+      display: none;
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #333;
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      opacity: 0.9;
+      z-index: 1000;
     }
   </style>
+</head>
+<body>
+  <div class="page-title">
+    <div class="main-title">뉴스 시사 라이브 달글 부속</div><br>
+    <div class="sub-title">댓관용 날조 정정 자료</div>
+    <div class="sub-title">박찬대 당대표 후보 밭갈이용 정보 모음 💙</div>
+  </div>
+
+  <div class="chat-container" id="chatBox"></div>
+
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="검색" oninput="filterMessages()" />
+  </div>
+
+  <div id="admin-panel">
+    <button onclick="showPasswordPrompt()">🔒 달주 전용</button>
+  </div>
+
+  <div id="input-area" style="display:none;">
+    <textarea id="newMessage" rows="3" placeholder="내용 입력..."></textarea>
+    <br />
+    <button onclick="addOrUpdateMessage()">내용 추가</button>
+  </div>
+
+  <div id="toast">📋 복사</div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -75,59 +151,63 @@
     let editingId = null;
 
     async function loadMessages() {
-      const container = document.getElementById("chat");
+      const container = document.getElementById("chatBox");
       container.innerHTML = "";
-      const q = query(collection(db, "message"), orderBy("timestamp", "desc"));
+      const q = query(collection(db, "message"), orderBy("timestamp", "asc"));
       const snapshot = await getDocs(q);
       snapshot.forEach(docSnap => {
         const data = docSnap.data();
         const id = docSnap.id;
         const msg = data.content;
-        const bubble = document.createElement("div");
-        bubble.className = "chat-bubble admin";
-        bubble.innerHTML = msg.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
+        const ts = data.timestamp ? data.timestamp.toDate() : new Date();
+        const dateOnly = ts.getFullYear() + '-' + String(ts.getMonth()+1).padStart(2, '0') + '-' + String(ts.getDate()).padStart(2, '0');
 
-        const controls = document.createElement("div");
-        controls.className = "admin-controls";
-        controls.innerHTML = `
-          <button onclick="editMessage('${id}', \`${msg}\`)">수정</button>
-          <button onclick="deleteMessage('${id}')">삭제</button>
+        const bubble = document.createElement("div");
+        bubble.className = "chat-bubble";
+        bubble.innerHTML = `
+          <div>${msg.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>')}</div>
+          <div class="timestamp">${dateOnly}</div>
         `;
-        bubble.appendChild(controls);
 
         bubble.addEventListener("click", () => {
           navigator.clipboard.writeText(msg).then(() => {
-            alert("복사되었습니다!");
+            const toast = document.getElementById("toast");
+            toast.style.display = "block";
+            setTimeout(() => toast.style.display = "none", 1500);
           });
         });
+
+        if (isAdmin) {
+          const btns = document.createElement("div");
+          btns.className = "bubble-buttons";
+          btns.style.display = "block";
+          const editBtn = document.createElement("button");
+          editBtn.textContent = "수정";
+          editBtn.onclick = () => {
+            document.getElementById("newMessage").value = msg;
+            editingId = id;
+          };
+          const delBtn = document.createElement("button");
+          delBtn.textContent = "삭제";
+          delBtn.onclick = async () => {
+            await deleteDoc(doc(db, "message", id));
+            loadMessages();
+          };
+          btns.appendChild(editBtn);
+          btns.appendChild(delBtn);
+          bubble.appendChild(btns);
+        }
 
         container.appendChild(bubble);
       });
     }
 
-    window.editMessage = async function(id, oldContent) {
-      const newContent = prompt("수정할 내용을 입력하세요:", oldContent);
-      if (newContent) {
-        await updateDoc(doc(db, "message", id), {
-          content: newContent,
-          timestamp: serverTimestamp()
-        });
-        loadMessages();
-      }
-    }
-
-    window.deleteMessage = async function(id) {
-      await deleteDoc(doc(db, "message", id));
-      loadMessages();
-    }
-
-    window.addOrUpdateMessage = async function() {
-      const content = document.getElementById("inputContent").value.trim();
-      if (!content) return alert("내용을 입력하세요.");
+    async function addOrUpdateMessage() {
+      const content = document.getElementById("newMessage").value.trim();
+      if (!content) return;
       if (editingId) {
         await updateDoc(doc(db, "message", editingId), {
-          content,
-          timestamp: serverTimestamp()
+          content
         });
         editingId = null;
       } else {
@@ -136,22 +216,34 @@
           timestamp: serverTimestamp()
         });
       }
-      document.getElementById("inputContent").value = "";
+      document.getElementById("newMessage").value = "";
       loadMessages();
     }
 
-    window.onload = function () {
-      loadMessages();
+    function showPasswordPrompt() {
+      const pwd = prompt("비밀번호를 입력하세요");
+      if (pwd === "980324") {
+        isAdmin = true;
+        document.getElementById("input-area").style.display = "block";
+        loadMessages();
+      } else {
+        alert("비밀번호가 틀렸습니다.");
+      }
     }
+
+    function filterMessages() {
+      const queryText = document.getElementById("searchInput").value.toLowerCase();
+      const bubbles = document.querySelectorAll(".chat-bubble");
+      bubbles.forEach(b => {
+        const text = b.textContent.toLowerCase();
+        b.style.display = text.includes(queryText) ? "block" : "none";
+      });
+    }
+
+    window.addOrUpdateMessage = addOrUpdateMessage;
+    window.showPasswordPrompt = showPasswordPrompt;
+    window.filterMessages = filterMessages;
+    window.onload = loadMessages;
   </script>
-</head>
-<body>
-  <h1>[여성시대] 뉴스 시사 라이브 달글 부속<br>댓관용 날조 정정 자료 / 박찬대 당대표 후보 밭갈이용 정보 모음 💙</h1>
-  <div class="chat-container" id="chat"></div>
-
-  <div class="input-section">
-    <textarea id="inputContent" rows="3" style="width:100%" placeholder="공지 내용을 입력하세요"></textarea><br />
-    <button onclick="addOrUpdateMessage()">공지 추가</button>
-  </div>
 </body>
 </html>
