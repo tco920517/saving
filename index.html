@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>공지 대화창 (모바일 클릭 복사 안정 버전)</title>
+  <title>[여성시대] 뉴스 시사 라이브 달글 부속 달글</title>
   <style>
     body {
       font-family: "Malgun Gothic", "맑은 고딕", sans-serif;
@@ -132,7 +132,7 @@
     <button onclick="addOrUpdateMessage()">공지 추가</button>
   </div>
 
-  <div id="toast">📋 복사되었습니다</div>
+  <div id="toast">📋 복사</div>
 
   <script>
     let editingIndex = null;
@@ -215,7 +215,7 @@
 
     function showPasswordPrompt() {
       const pwd = prompt("관리자 비밀번호를 입력하세요");
-      if (pwd === "1234") {
+      if (pwd === "980324") {
         isAdmin = true;
         document.getElementById("input-area").style.display = "block";
         renderMessages();
@@ -235,5 +235,125 @@
 
     renderMessages();
   </script>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import {
+      getFirestore, collection, getDocs, addDoc, deleteDoc, updateDoc,
+      doc, serverTimestamp, query, orderBy
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAZHqkGXdH4XxL-0jprA2DB7YO4XhTdNmQ",
+      authDomain: "chat-page-6d547.firebaseapp.com",
+      projectId: "chat-page-6d547",
+      storageBucket: "chat-page-6d547.appspot.com",
+      messagingSenderId: "1087235341754",
+      appId: "1:1087235341754:web:6583340a62f21068b5b183"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    let isAdmin = false;
+    let editingId = null;
+
+    async function loadMessages() {
+      const container = document.getElementById("chatBox");
+      container.innerHTML = "";
+      const q = query(collection(db, "message"), orderBy("timestamp", "desc"));
+      const snapshot = await getDocs(q);
+      snapshot.forEach(docSnap => {
+        const data = docSnap.data();
+        const id = docSnap.id;
+        const msg = data.content;
+        const bubble = document.createElement("div");
+        bubble.className = "chat-bubble";
+        bubble.innerHTML = msg.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
+
+        function copyContent() {
+          navigator.clipboard.writeText(msg).then(() => {
+            const toast = document.getElementById("toast");
+            toast.style.display = "block";
+            setTimeout(() => toast.style.display = "none", 1500);
+          });
+        }
+        bubble.addEventListener("click", copyContent);
+        bubble.addEventListener("touchend", copyContent);
+
+        if (isAdmin) {
+          const btns = document.createElement("div");
+          btns.className = "bubble-buttons";
+          btns.style.display = "block";
+
+          const editBtn = document.createElement("button");
+          editBtn.textContent = "수정";
+          editBtn.onclick = () => {
+            document.getElementById("newMessage").value = msg;
+            editingId = id;
+          };
+
+          const delBtn = document.createElement("button");
+          delBtn.textContent = "삭제";
+          delBtn.onclick = async () => {
+            await deleteDoc(doc(db, "message", id));
+            loadMessages();
+          };
+
+          btns.appendChild(editBtn);
+          btns.appendChild(delBtn);
+          bubble.appendChild(btns);
+        }
+
+        container.appendChild(bubble);
+      });
+    }
+
+    async function addOrUpdateMessage() {
+      const content = document.getElementById("newMessage").value.trim();
+      if (!content) return;
+      if (editingId) {
+        await updateDoc(doc(db, "message", editingId), {
+          content,
+          timestamp: serverTimestamp()
+        });
+        editingId = null;
+      } else {
+        await addDoc(collection(db, "message"), {
+          content,
+          timestamp: serverTimestamp()
+        });
+      }
+      document.getElementById("newMessage").value = "";
+      loadMessages();
+    }
+
+    function showPasswordPrompt() {
+      const pwd = prompt("관리자 비밀번호를 입력하세요");
+      if (pwd === "1234") {
+        isAdmin = true;
+        document.getElementById("input-area").style.display = "block";
+        loadMessages();
+      } else {
+        alert("비밀번호가 틀렸습니다.");
+      }
+    }
+
+    function filterMessages() {
+      const queryText = document.getElementById("searchInput").value.toLowerCase();
+      const bubbles = document.querySelectorAll(".chat-bubble");
+      bubbles.forEach(b => {
+        const text = b.textContent.toLowerCase();
+        b.style.display = text.includes(queryText) ? "block" : "none";
+      });
+    }
+
+    window.addOrUpdateMessage = addOrUpdateMessage;
+    window.showPasswordPrompt = showPasswordPrompt;
+    window.filterMessages = filterMessages;
+    window.onload = loadMessages;
+  </script>
+
 </body>
 </html>
