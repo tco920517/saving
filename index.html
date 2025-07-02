@@ -44,6 +44,7 @@
     max-width: 80%;
     padding: 10px 14px;
     margin: 10px auto;
+    text-align: left;
     border-radius: 18px;
     font-size: 14px;
     line-height: 1.5;
@@ -123,11 +124,27 @@
 <body>
 <div class="page-title">
   <div class="main-title">뉴스 시사 라이브 달글 부속</div><br/>
-  <div class="sub-title"><span style="font-size: 12px; color: #777;">💡 → 날조 사실에 대한 팩트 정리</span></div>
-  <div class="sub-title"><span style="font-size: 12px; color: #777;">🔵 → 박찬대 당대표 후보 밭갈이용</span></div>
-  <div class="sub-title"><span style="font-size: 12px; color: #777;">🔔 → 참고하면 좋은 정보</span></div>
-  <div class="search-bar"><input id="searchInput" oninput="filterMessages()" placeholder="검색" type="text"/></div>
+  <div style="font-size: 13px; color: #333; text-align: center; margin: 0 auto 10px;">
+  업로드 요청은<br/>
+  <a href="https://cafe.daum.net/subdued20club/VrjL/940638" target="_blank" style="color: #1a0dab; text-decoration: underline;">
+    https://cafe.daum.net/subdued20club/VrjL/940638
+  </a>
 </div>
+
+
+  <div class="search-bar" style="display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
+  <select id="prefixFilter" onchange="filterMessages()" 
+    style="flex: 0 0 auto; max-width: 120px; padding: 8px 12px; font-size: 14px; border: 1px solid #ccc; border-radius: 8px;">
+    <option value="">전체 말머리</option>
+    <option value="💡 팩트 정리">💡 팩트 정리</option>
+    <option value="🔵 박찬대 밭갈이용">🔵 박찬대 밭갈이용</option>
+    <option value="🔔 참고">🔔 참고</option>
+  </select>
+
+  <input id="searchInput" oninput="filterMessages()" placeholder="내용 검색" type="text"
+    style="flex: 1 1 auto; min-width: 0; padding: 8px 12px; font-size: 14px; border: 1px solid #ccc; border-radius: 8px; max-width: 340px;" />
+</div>
+
 <div class="chat-container" id="chatBox"></div>
 <div id="admin-panel"><button onclick="showPasswordPrompt()">🔒 달주 전용</button></div>
 <div id="input-area" style="display:none;">
@@ -297,10 +314,13 @@ function showPasswordPrompt() {
 
 function filterMessages() {
   const queryText = document.getElementById("searchInput").value.toLowerCase();
+  const selectedPrefix = document.getElementById("prefixFilter")?.value || "";
   const bubbles = document.querySelectorAll(".chat-bubble");
   bubbles.forEach(b => {
     const text = b.textContent.toLowerCase();
-    b.style.display = text.includes(queryText) ? "block" : "none";
+    const prefixMatch = selectedPrefix === "" || text.includes(selectedPrefix.toLowerCase());
+    const textMatch = text.includes(queryText);
+    b.style.display = (prefixMatch && textMatch) ? "block" : "none";
   });
 }
 
