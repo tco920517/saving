@@ -245,11 +245,44 @@ async function loadMessages() {
     contentDiv.appendChild(inner);
 
     // PC 클릭 복사
-    inner.addEventListener("click", () => {
-      if (!/Mobi|Android/i.test(navigator.userAgent)) {
-        copyTextToClipboard(msg);
+    
+
+    
+    
+    
+    
+    // 복사 버튼 추가
+    const copyBtn = document.createElement("button");
+    copyBtn.textContent = "복사";
+    copyBtn.style.cssText = "position: absolute; bottom: 15px; left: 10px; font-size: 12px; padding: 4px 8px; border-radius: 6px; background-color: #eee; color: #000; border: none; cursor: pointer;";
+    copyBtn.onclick = () => {
+      // 말머리를 제거한 텍스트 추출
+      let raw = inner.innerText.trim();
+      if (raw.startsWith("💡") || raw.startsWith("🔵") || raw.startsWith("🔔")) {
+        raw = raw.substring(raw.indexOf("\n") + 1).trim();
       }
-    });
+      const textarea = document.createElement("textarea");
+      textarea.value = raw;
+      textarea.setAttribute("readonly", "");
+      textarea.style.position = "absolute";
+      textarea.style.left = "-9999px";
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand("copy");
+        const toast = document.getElementById("toast");
+        toast.textContent = "📋 복사 완료";
+        toast.style.display = "block";
+        setTimeout(() => toast.style.display = "none", 1500);
+      } catch (err) {
+        console.error("복사 실패", err);
+      }
+      document.body.removeChild(textarea);
+    };
+    contentDiv.appendChild(copyBtn);
+
+
+
 
     contentDiv.appendChild(toggle);
     bubble.appendChild(contentDiv);
