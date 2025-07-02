@@ -438,6 +438,46 @@ window.onload = () => {
   incrementVisitorCountIfNew();
 };
 
+
+function getKSTDateKey() {
+  const now = new Date();
+  const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+  return kst.toISOString().split('T')[0];
+}
+
+async function incrementVisitIfNew() {
+  const key = "visited_" + getKSTDateKey();
+  if (localStorage.getItem(key)) return;
+
+  const ref = doc(db, "stats", getKSTDateKey());
+  const docSnap = await getDoc(ref);
+  if (!docSnap.exists()) {
+    await setDoc(ref, { count: 1 });
+  } else {
+    await updateDoc(ref, { count: increment(1) });
+  }
+
+  localStorage.setItem(key, "yes");
+}
+
+function subscribeVisitorDisplay() {
+  const ref = doc(db, "stats", getKSTDateKey());
+  onSnapshot(ref, (docSnap) => {
+    let count = docSnap.exists() ? docSnap.data().count : 0;
+    let div = document.getElementById("visitor-counter");
+    if (!div) {
+      const adminPanel = document.getElementById("admin-panel");
+      div = document.createElement("div");
+      div.id = "visitor-counter";
+      div.style.cssText = "text-align:center; margin-top:5px; font-size:13px; color:#333;";
+      adminPanel.insertAdjacentElement("afterend", div);
+    }
+    div.textContent = `오늘 방문자 수: ${count.toLocaleString()}명`;
+  });
+}
+
+incrementVisitIfNew();
+subscribeVisitorDisplay();
 </script>
 
 
