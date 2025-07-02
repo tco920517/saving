@@ -247,6 +247,26 @@ async function loadMessages() {
 
     contentDiv.appendChild(inner);
 
+    requestAnimationFrame(() => {
+      const oldToggle = contentDiv.querySelector(".toggle-more");
+      if (oldToggle) oldToggle.remove();
+
+      const isOverflowed = inner.scrollHeight > inner.clientHeight + 4;
+      if (isOverflowed) {
+        const toggle = document.createElement("div");
+        toggle.className = "toggle-more";
+        toggle.textContent = "더보기";
+        toggle.style.cssText = "text-align:right; font-size:12px; color:gray; cursor:pointer;";
+        toggle.addEventListener("click", (event) => {
+          event.stopPropagation();
+          contentDiv.classList.toggle("expanded");
+          toggle.textContent = contentDiv.classList.contains("expanded") ? "줄임" : "더보기";
+        });
+        contentDiv.appendChild(toggle);
+      }
+    });
+
+
     // PC 클릭 복사
     
 
@@ -352,7 +372,7 @@ function showPasswordPrompt() {
 function filterMessages() {
   const queryText = document.getElementById("searchInput").value.toLowerCase();
   const selectedPrefix = document.getElementById("prefixFilter")?.value || "";
-  const bubbles = document.querySelectorAll(".chat-bubble");
+  const bubbles = document.querySelectorAll(".chat-card");
   bubbles.forEach(b => {
     const text = b.textContent.toLowerCase();
     const prefixMatch = selectedPrefix === "" || text.includes(selectedPrefix.toLowerCase());
