@@ -1,158 +1,150 @@
-
 <!DOCTYPE html>
-
 <html lang="ko">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>[여성시대] 뉴스 시사 라이브 달글 부속</title>
 <style>
-    body {
-      font-family: "Malgun Gothic", sans-serif;
-      background-color: #f2f5f8;
-      margin: 0;
-      padding: 0;
-      font-size: 14px;
-    }
-    .page-title {
-  max-width: 700px;
-  margin: 30px auto 20px;
-  text-align: center;
-  padding: 0 15px;
-  line-height: 1.6;
-  user-select: text;
-}
-    .page-title .main-title {
-      font-size: 21px;
-      font-weight: bold;
-    }
-    .page-title .sub-title {
-      font-size: 13px;
-      font-weight: normal;
-    }
-    .chat-container {
-  width: 100%;
-  max-width: 500px;
-  box-sizing: border-box;
-  height: 600px;
-  overflow-y: auto;
-  margin: 0 auto;
-  padding: 10px;
-  background-color: #e0f3ff;
-  border-radius: 15px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
-    .chat-bubble {
-  max-width: 80%;
-  padding: 10px 14px;
-  margin: 10px auto;
-  border-radius: 18px;
-  font-size: 14px;
-  line-height: 1.5;
-  word-wrap: break-word;
-  background-color: #ffffff;
-  border: 1px solid #dcdcdc;
-  position: relative;
-  user-select: text;
-  -webkit-user-select: text;
-}
-    .timestamp {
-      font-size: 12px;
-      color: #888;
-      text-align: right;
-      margin-top: 4px;
-    }
-    .bubble-buttons {
-      display: none;
-      font-size: 12px;
-      margin-top: 6px;
-      text-align: right;
-    }
-    .search-bar, #input-area, #admin-panel {
-      max-width: 500px;
-      margin: 20px auto;
-      text-align: center;
-    }
-    .search-bar input {
-  width: 100%;
-  max-width: 333px;
-  margin: 0 auto;
-  display: block;
-  padding: 8px 12px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-}
-    button {
-      margin-top: 10px;
-      padding: 6px 12px;
-      font-size: 14px;
-      border-radius: 8px;
-      border: none;
-      background-color: #aaa;
-      color: white;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #888;
-    }
-    #toast {
-      display: none;
-      position: fixed;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: #333;
-      color: #fff;
-      padding: 10px 16px;
-      border-radius: 20px;
-      font-size: 14px;
-      opacity: 0.9;
-      z-index: 1000;
-    }
-    .chat-content.preview .inner-text {
-      max-height: 4.5em;
-      overflow: hidden;
-    }
-    .chat-content.expanded .inner-text {
-      max-height: none;
-    }
-    .chat-content .inner-text {
-  transition: max-height 0.3s ease;
-  user-select: text;
-  -webkit-user-select: text;
-  -webkit-touch-callout: text;
-  pointer-events: auto;
-}
+  body {
+    font-family: "Malgun Gothic", sans-serif;
+    background-color: #f2f5f8;
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+  }
+  .page-title {
+    max-width: 700px;
+    margin: 30px auto 20px;
+    text-align: center;
+    padding: 0 15px;
+    line-height: 1.6;
+    user-select: text;
+  }
+  .page-title .main-title {
+    font-size: 21px;
+    font-weight: bold;
+  }
+  .page-title .sub-title {
+    font-size: 13px;
+    font-weight: normal;
+  }
+  .chat-container {
+    width: 100%;
+    max-width: 500px;
+    box-sizing: border-box;
+    height: 600px;
+    overflow-y: auto;
+    margin: 0 auto;
+    padding: 10px;
+    background-color: #e0f3ff;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  }
+  .chat-bubble {
+    max-width: 80%;
+    padding: 10px 14px;
+    margin: 10px auto;
+    border-radius: 18px;
+    font-size: 14px;
+    line-height: 1.5;
+    word-wrap: break-word;
+    background-color: #ffffff;
+    border: 1px solid #dcdcdc;
+    position: relative;
+    user-select: text;
+  }
+  .timestamp {
+    font-size: 12px;
+    color: #888;
+    text-align: right;
+    margin-top: 4px;
+  }
+  .bubble-buttons {
+    display: none;
+    font-size: 12px;
+    margin-top: 6px;
+    text-align: right;
+  }
+  .search-bar, #input-area, #admin-panel {
+    max-width: 500px;
+    margin: 20px auto;
+    text-align: center;
+  }
+  .search-bar input {
+    width: 100%;
+    max-width: 333px;
+    margin: 0 auto;
+    display: block;
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+  }
+  button {
+    margin-top: 10px;
+    padding: 6px 12px;
+    font-size: 14px;
+    border-radius: 8px;
+    border: none;
+    background-color: #aaa;
+    color: white;
+    cursor: pointer;
+  }
+  button:hover {
+    background-color: #888;
+  }
+  #toast {
+    display: none;
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    opacity: 0.9;
+    z-index: 1000;
+  }
+  .chat-content.preview .inner-text {
+    max-height: 4.5em;
+    overflow: hidden;
+  }
+  .chat-content.expanded .inner-text {
+    max-height: none;
+  }
+  .chat-content .inner-text {
+    transition: max-height 0.3s ease;
+    user-select: text;
+  }
 </style>
 </head>
 <body>
 <div class="page-title">
-<div class="main-title">뉴스 시사 라이브 달글 부속</div><br/>
-<div class="sub-title"><span style="font-size: 12px; color: #777;">💡 → 날조 사실에 대한 팩트 정리</span></div>
-<div class="sub-title"><span style="font-size: 12px; color: #777;">🔵 → 박찬대 당대표 후보 밭갈이용</span></div>
-<div class="sub-title"><span style="font-size: 12px; color: #777;">🔔 → 참고하면 좋은 정보</span></div><div class="search-bar">
-<input id="searchInput" oninput="filterMessages()" placeholder="검색" type="text"/>
-</div>
+  <div class="main-title">뉴스 시사 라이브 달글 부속</div><br/>
+  <div class="sub-title"><span style="font-size: 12px; color: #777;">💡 → 날조 사실에 대한 팩트 정리</span></div>
+  <div class="sub-title"><span style="font-size: 12px; color: #777;">🔵 → 박찬대 당대표 후보 밭갈이용</span></div>
+  <div class="sub-title"><span style="font-size: 12px; color: #777;">🔔 → 참고하면 좋은 정보</span></div>
+  <div class="search-bar"><input id="searchInput" oninput="filterMessages()" placeholder="검색" type="text"/></div>
 </div>
 <div class="chat-container" id="chatBox"></div>
-<div id="admin-panel">
-<button onclick="showPasswordPrompt()">🔒 달주 전용</button>
-</div>
+<div id="admin-panel"><button onclick="showPasswordPrompt()">🔒 달주 전용</button></div>
 <div id="input-area" style="display:none;">
-  <textarea id="newMessage" placeholder="내용" rows="3"
-    style="width: 100%; height: 160px; box-sizing: border-box; overflow-y: auto;"></textarea>
+  <select id="prefix" style="width: 100%; max-width: 500px; margin-bottom: 8px; padding: 6px; font-size: 14px;">
+    <option value="">말머리 없음</option>
+    <option value="💡 팩트 정리">💡 팩트 정리</option>
+    <option value="🔵 박찬대 밭갈이용">🔵 박찬대 밭갈이용</option>
+    <option value="🔔 참고">🔔 참고</option>
+  </select>
+  <textarea id="newMessage" placeholder="내용" rows="3" style="width: 100%; height: 160px; box-sizing: border-box; overflow-y: auto;"></textarea>
   <br/>
   <button onclick="addOrUpdateMessage()">내용 추가</button>
 </div>
 <div id="toast">📋 복사</div>
-
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import {
-  getFirestore, collection, getDocs, addDoc, deleteDoc, updateDoc,
-  doc, serverTimestamp, query, orderBy
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, addDoc, deleteDoc, updateDoc, doc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAZHqkGXdH4XxL-0jprA2DB7YO4XhTdNmQ",
@@ -173,29 +165,7 @@ async function loadMessages() {
   const container = document.getElementById("chatBox");
   container.innerHTML = "";
   const q = query(collection(db, "message"), orderBy("timestamp", "asc"));
-  const snapshot = await getDocs(q);
-  snapshot.forEach(docSnap => {
-    const data = docSnap.data();
-    const id = docSnap.id;
-    const msg = data.content;
-    const ts = data.timestamp ? data.timestamp.toDate() : new Date();
-    const dateOnly = ts.getFullYear() + '-' + String(ts.getMonth()+1).padStart(2, '0') + '-' + String(ts.getDate()).padStart(2, '0');
-
-    const bubble = document.createElement("div");
-    bubble.className = "chat-bubble";
-    bubble.style.userSelect = "none";
-    bubble.style.webkitUserSelect = "none";
-    bubble.style.webkitTouchCallout = "none";
-
-    const contentDiv = document.createElement("div");
-    contentDiv.className = "chat-content preview";
-
-    const inner = document.createElement("div");
-    inner.className = "inner-text";
-    inner.innerHTML = msg.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>').replace(/\n/g, '<br>');
-    inner.style.userSelect = "none";
-    inner.style.webkitUserSelect = "none";
-
+  
     function copyTextToClipboard(text) {
       const textarea = document.createElement("textarea");
       textarea.value = text;
@@ -215,6 +185,37 @@ async function loadMessages() {
       document.body.removeChild(textarea);
     }
 
+  const snapshot = await getDocs(q);
+  snapshot.forEach(docSnap => {
+    const data = docSnap.data();
+    const id = docSnap.id;
+    const msg = data.content;
+    const prefix = data.prefix || "";
+    const ts = data.timestamp ? data.timestamp.toDate() : new Date();
+    const dateOnly = ts.getFullYear() + '-' + String(ts.getMonth()+1).padStart(2, '0') + '-' + String(ts.getDate()).padStart(2, '0');
+
+    const bubble = document.createElement("div");
+    bubble.className = "chat-bubble";
+
+    const contentDiv = document.createElement("div");
+    contentDiv.className = "chat-content preview";
+
+    const inner = document.createElement("div");
+    inner.className = "inner-text";
+    inner.innerHTML = `${prefix ? `<strong>${prefix}</strong><br>` : ""}` + msg.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>').replace(/\n/g, '<br>');
+
+    const toggle = document.createElement("div");
+    toggle.className = "toggle-more";
+    toggle.textContent = "더보기";
+    toggle.style.cssText = "text-align:right; font-size:12px; color:gray; cursor:pointer;";
+    toggle.addEventListener("click", (event) => {
+      event.stopPropagation();
+      contentDiv.classList.toggle("expanded");
+      toggle.textContent = contentDiv.classList.contains("expanded") ? "줄임" : "더보기";
+    });
+
+    contentDiv.appendChild(inner);
+    
     // PC 클릭 복사
     inner.addEventListener("click", () => {
       if (!/Mobi|Android/i.test(navigator.userAgent)) {
@@ -233,17 +234,6 @@ async function loadMessages() {
       clearTimeout(pressTimer);
     });
 
-    const toggle = document.createElement("div");
-    toggle.className = "toggle-more";
-    toggle.textContent = "더보기";
-    toggle.style.cssText = "text-align:right; font-size:12px; color:gray; cursor:pointer;";
-    toggle.addEventListener("click", (event) => {
-      event.stopPropagation();
-      contentDiv.classList.toggle("expanded");
-      toggle.textContent = contentDiv.classList.contains("expanded") ? "줄임" : "더보기";
-    });
-
-    contentDiv.appendChild(inner);
     contentDiv.appendChild(toggle);
     bubble.appendChild(contentDiv);
 
@@ -260,6 +250,7 @@ async function loadMessages() {
       editBtn.textContent = "수정";
       editBtn.onclick = () => {
         document.getElementById("newMessage").value = msg;
+        document.getElementById("prefix").value = prefix;
         editingId = id;
       };
       const delBtn = document.createElement("button");
@@ -280,17 +271,16 @@ async function loadMessages() {
 
 async function addOrUpdateMessage() {
   const content = document.getElementById("newMessage").value.trim();
+  const prefix = document.getElementById("prefix").value;
   if (!content) return;
   if (editingId) {
-    await updateDoc(doc(db, "message", editingId), { content });
+    await updateDoc(doc(db, "message", editingId), { content, prefix });
     editingId = null;
   } else {
-    await addDoc(collection(db, "message"), {
-      content,
-      timestamp: serverTimestamp()
-    });
+    await addDoc(collection(db, "message"), { content, prefix, timestamp: serverTimestamp() });
   }
   document.getElementById("newMessage").value = "";
+  document.getElementById("prefix").value = "";
   loadMessages();
 }
 
@@ -318,5 +308,6 @@ window.addOrUpdateMessage = addOrUpdateMessage;
 window.showPasswordPrompt = showPasswordPrompt;
 window.filterMessages = filterMessages;
 window.onload = loadMessages;
-</script></body>
+</script>
+</body>
 </html>
