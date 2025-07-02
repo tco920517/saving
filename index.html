@@ -140,9 +140,10 @@
 <button onclick="showPasswordPrompt()">🔒 달주 전용</button>
 </div>
 <div id="input-area" style="display:none;">
-<textarea id="newMessage" placeholder="내용" rows="3" style="width: 100%; height: 80px; box-sizing: border-box;"></textarea>
-<br/>
-<button onclick="addOrUpdateMessage()">내용 추가</button>
+  <textarea id="newMessage" placeholder="내용" rows="3"
+    style="width: 100%; height: 160px; box-sizing: border-box; overflow-y: auto;"></textarea>
+  <br/>
+  <button onclick="addOrUpdateMessage()">내용 추가</button>
 </div>
 <div id="toast">📋 복사</div>
 
