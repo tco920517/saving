@@ -164,66 +164,26 @@
   <button onclick="addOrUpdateMessage()">내용 추가</button>
 </div>
 <div id="toast">📋 복사</div>
-
-
-
-
-<script>
-function getTodayKSTDateString() {
-  const now = new Date();
-  const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
-  return kst.toISOString().split('T')[0];
-}
-
-function incrementVisitorCountIfNew() {
-  const today = getTodayKSTDateString();
-  const visitKey = "visited_" + today;
-  const countKey = "visitorCount_" + today;
-
-  // 이미 방문했다면 증가시키지 않음
-  if (localStorage.getItem(visitKey) === "yes") {
-    updateVisitorDisplay(parseInt(localStorage.getItem(countKey) || "1"));
-    return;
-  }
-
-  // 방문한 적 없다면 +1
-  let visitorCount = parseInt(localStorage.getItem(countKey) || "0");
-  visitorCount += 1;
-
-  localStorage.setItem(countKey, visitorCount);
-  localStorage.setItem(visitKey, "yes");
-
-  updateVisitorDisplay(visitorCount);
-}
-
-function updateVisitorDisplay(count) {
-  let counterDiv = document.getElementById("visitor-counter");
-  if (!counterDiv) {
-    const adminPanel = document.getElementById("admin-panel");
-    counterDiv = document.createElement("div");
-    counterDiv.id = "visitor-counter";
-    counterDiv.style.cssText = "text-align: center; margin-top: 5px; font-size: 13px; color: #333;";
-    adminPanel.insertAdjacentElement("afterend", counterDiv);
-  }
-  counterDiv.textContent = `오늘 방문자 수: ${count.toLocaleString()}명`;
-}
-
-// 기존 onload와 병합
-const originalOnload = window.onload;
-window.onload = () => {
-  if (typeof originalOnload === "function") originalOnload();
-  incrementVisitorCountIfNew();
-};
-</script>
-
-
-
-
-
-
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc, deleteDoc, updateDoc, doc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  addDoc,
+  deleteDoc,
+  updateDoc,
+  doc,
+  serverTimestamp,
+  query,
+  orderBy,
+  getDoc,
+  setDoc,
+  increment,
+  onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyAZHqkGXdH4XxL-0jprA2DB7YO4XhTdNmQ",
@@ -433,11 +393,7 @@ function filterMessages() {
 window.addOrUpdateMessage = addOrUpdateMessage;
 window.showPasswordPrompt = showPasswordPrompt;
 window.filterMessages = filterMessages;
-window.onload = () => {
-  loadMessages?.();
-  incrementVisitorCountIfNew();
-};
-
+window.onload = loadMessages;
 
 function getKSTDateKey() {
   const now = new Date();
