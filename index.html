@@ -365,37 +365,54 @@ window.onload = loadMessages;
 </script>
 
 
-<script>
-function getKoreaDateString() {
-  const now = new Date();
-  const koreaTime = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Seoul" }));
-  return koreaTime.toISOString().split("T")[0];
-}
 
-function updateVisitorCount() {
-  const today = getKoreaDateString();
-  const visitedKey = "visited_" + today;
-  const countKey = "visit_count_" + today;
 
-  if (!localStorage.getItem(visitedKey)) {
-    let count = parseInt(localStorage.getItem(countKey) || "0");
-    count += 1;
-    localStorage.setItem(countKey, count);
-    localStorage.setItem(visitedKey, "true");
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAZHqkGXdH4XxL-0jprA2DB7YO4XhTdNmQ",
+    authDomain: "chat-page-6d547.firebaseapp.com",
+    projectId: "chat-page-6d547",
+    storageBucket: "chat-page-6d547.appspot.com",
+    messagingSenderId: "1087235341754",
+    appId: "1:1087235341754:web:6583340a62f21068b5b183"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  async function countVisitor() {
+    const today = new Date().toISOString().split("T")[0];
+    const uid = today + "_" + navigator.userAgent.slice(0, 40).replace(/[^a-zA-Z0-9]/g, "_");
+
+    const docRef = doc(db, "visit_count", uid);
+    const docSnap = await getDoc(docRef);
+
+    if (!docSnap.exists()) {
+      await setDoc(docRef, {
+        timestamp: serverTimestamp(),
+        date: today
+      });
+    }
+
+    updateCount(today);
   }
 
-  let currentCount = localStorage.getItem(countKey);
-  if (!currentCount) {
-    currentCount = "1";
-    localStorage.setItem(countKey, "1");
+  async function updateCount(today) {
+    const res = await fetch(
+      `https://firestore.googleapis.com/v1/projects/chat-page-6d547/databases/(default)/documents/visit_count?pageSize=1000`
+    );
+    const json = await res.json();
+    const docs = json.documents || [];
+    const todayDocs = docs.filter(d => d.fields.date && d.fields.date.stringValue === today);
+    document.getElementById("visitor-counter").textContent = "📊 오늘 방문자 수: " + todayDocs.length + "명";
   }
 
-  document.getElementById("visitor-counter").textContent = "📊 오늘 방문자 수: " + currentCount + "명";
-}
-
-window.addEventListener("load", updateVisitorCount);
+  window.addEventListener("load", countVisitor);
 </script>
+
 </body>
 </html>
-
 
