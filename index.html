@@ -152,9 +152,6 @@
 
 <div class="chat-container" id="chatBox"></div>
 <div id="admin-panel"><button onclick="showPasswordPrompt()">🔒 관리자 전용</button></div>
-<div id="visitor-count" style="text-align: center; font-size: 13px; color: #444; margin-top: 8px;">
-  방문자 수 불러오는 중...
-</div>
 <div id="input-area" style="display:none;">
   <select id="prefix" style="width: 100%; max-width: 500px; margin-bottom: 8px; padding: 6px; font-size: 14px;">
     <option value="">말머리 없음</option>
@@ -380,35 +377,6 @@ window.addOrUpdateMessage = addOrUpdateMessage;
 window.showPasswordPrompt = showPasswordPrompt;
 window.filterMessages = filterMessages;
 window.onload = loadMessages;
-// 방문자 수 기록
-async function updateVisitorCount() {
-  const countDiv = document.getElementById("visitor-count");
-  try {
-    const now = new Date();
-    const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-    const kst = new Date(utc + (9 * 60 * 60000));
-    const dateStr = kst.toISOString().slice(0, 10);
-
-    const counterRef = doc(collection(db, "visitors"), dateStr);
-    const counterSnap = await getDoc(counterRef);
-
-    if (counterSnap.exists()) {
-      await setDoc(counterRef, { count: increment(1) }, { merge: true });
-    } else {
-      await setDoc(counterRef, { count: 1 });
-    }
-
-    const updatedSnap = await getDoc(counterRef);
-    const count = updatedSnap.data()?.count || 1;
-    countDiv.textContent = `📈 오늘(${dateStr}) 방문자 수: ${count.toLocaleString()}명`;
-  } catch (err) {
-    console.error("방문자 수 처리 실패:", err);
-    countDiv.textContent = "방문자 수 불러오기 실패";
-  }
-}
-
-updateVisitorCount();
-
 </script>
 
 
