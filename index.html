@@ -14,7 +14,7 @@
   }
   .page-title {
     max-width: 700px;
-    margin: 40px auto 20px;
+    margin: 30px auto 20px;
     text-align: center;
     padding: 0 15px;
     line-height: 1.6;
@@ -123,11 +123,9 @@
 </head>
 <body>
 <div class="page-title">
-  <div class="main-title">뉴스 시사 라이브 달글 부속</div>
+<div class="main-title">뉴스 시사 라이브 달글 부속</div>
 <br/>
-
-
-  <div style="font-size: 12px; color: #333; text-align: center; margin: 0 auto 10px;">
+<div style="font-size: 12px; color: #333; text-align: center; margin: 0 auto 10px;">
 상호 소통이 가능한 외부 홈페이지는 여성시대 전체 공지 위반이 될 수 있다 생각해서, 달주가 업로드하는 방식으로 제작했습니다.<br/><br/>
   업로드 요청은 <a href="https://cafe.daum.net/subdued20club/VrjL/940638" target="_blank" style="color: #1a0dab; text-decoration: underline;">
     https://cafe.daum.net/subdued20club/VrjL/940638
@@ -139,6 +137,8 @@
     https://docs.google.com/forms/d/e/1FAIpQLScAiT3buFKXh5-Wagzh3uxNjJnnoZ6lmU8eNShsU-Xpmqmhkg/viewform
   </a>
 </div>
+
+
   <div class="search-bar" style="display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
   <select id="prefixFilter" onchange="filterMessages()" 
     style="flex: 0 0 auto; max-width: 120px; padding: 8px 12px; font-size: 14px; border: 1px solid #ccc; border-radius: 8px;">
@@ -154,7 +154,9 @@
 
 <div class="chat-container" id="chatBox"></div>
 <div id="admin-panel"><button onclick="showPasswordPrompt()">🔒 달주 전용</button></div>
-<div id="visitor-count" style="font-size: 12px; color: #555; text-align: center; margin-top: 10px;">오늘 방문자 수: 계산 중...</div>
+
+<div id="visitor-counter" style="text-align:center; margin-top: 10px; font-size: 13px; color: #555;"></div>
+
 <div id="input-area" style="display:none;">
   <select id="prefix" style="width: 100%; max-width: 500px; margin-bottom: 8px; padding: 6px; font-size: 14px;">
     <option value="">말머리 없음</option>
@@ -169,7 +171,7 @@
 <div id="toast">📋 복사</div>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc, deleteDoc, updateDoc, doc, serverTimestamp, query, orderBy, getDoc, setDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, addDoc, deleteDoc, updateDoc, doc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAZHqkGXdH4XxL-0jprA2DB7YO4XhTdNmQ",
@@ -182,30 +184,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-
-// ✅ 방문자 수 처리 함수
-async function updateVisitorCount() {
-  const now = new Date();
-  const kst = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Seoul" }));
-  const today = kst.toISOString().slice(0, 10);
-  const localKey = "visited_" + today;
-
-  if (!localStorage.getItem(localKey)) {
-    const visitorRef = doc(db, "visitors", today);
-    await setDoc(visitorRef, { count: increment(1) }, { merge: true });
-    localStorage.setItem(localKey, "true");
-  }
-
-  const visitorRef = doc(db, "visitors", today);
-  const snap = await getDoc(visitorRef);
-  if (snap.exists()) {
-    document.getElementById("visitor-count").textContent =
-      "오늘 방문자 수: " + snap.data().count + "명";
-  } else {
-    document.getElementById("visitor-count").textContent = "오늘 방문자 수: 1명";
-  }
-}
-
 
 let isAdmin = false;
 let editingId = null;
@@ -234,6 +212,7 @@ async function loadMessages() {
       document.body.removeChild(textarea);
     }
 
+  
   const snapshot = await getDocs(q);
   snapshot.forEach(docSnap => {
     const data = docSnap.data();
@@ -264,23 +243,12 @@ async function loadMessages() {
     });
 
     contentDiv.appendChild(inner);
-    
+
     // PC 클릭 복사
     inner.addEventListener("click", () => {
       if (!/Mobi|Android/i.test(navigator.userAgent)) {
         copyTextToClipboard(msg);
       }
-    });
-
-    // 모바일 롱탭 복사
-    let pressTimer;
-    bubble.addEventListener("touchstart", () => {
-      pressTimer = setTimeout(() => {
-        copyTextToClipboard(msg);
-      }, 600);
-    });
-    bubble.addEventListener("touchend", () => {
-      clearTimeout(pressTimer);
     });
 
     contentDiv.appendChild(toggle);
@@ -316,6 +284,7 @@ async function loadMessages() {
     container.appendChild(bubble);
   });
   container.scrollTop = container.scrollHeight;
+
 }
 
 async function addOrUpdateMessage() {
@@ -359,10 +328,41 @@ function filterMessages() {
 window.addOrUpdateMessage = addOrUpdateMessage;
 window.showPasswordPrompt = showPasswordPrompt;
 window.filterMessages = filterMessages;
-window.onload = () => {
-  loadMessages();
-  updateVisitorCount();
-};
+window.onload = loadMessages;
+</script>
+
+
+<script>
+function getKoreaDateString() {
+  const now = new Date();
+  const koreaTime = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Seoul" }));
+  return koreaTime.toISOString().split("T")[0];
+}
+
+function updateVisitorCount() {
+  const today = getKoreaDateString();
+  const visitedKey = "visited_" + today;
+  const countKey = "visit_count_" + today;
+
+  if (!localStorage.getItem(visitedKey)) {
+    let count = parseInt(localStorage.getItem(countKey) || "0");
+    count += 1;
+    localStorage.setItem(countKey, count);
+    localStorage.setItem(visitedKey, "true");
+  }
+
+  let currentCount = localStorage.getItem(countKey);
+  if (!currentCount) {
+    currentCount = "1";
+    localStorage.setItem(countKey, "1");
+  }
+
+  document.getElementById("visitor-counter").textContent = "📊 오늘 방문자 수: " + currentCount + "명";
+}
+
+window.addEventListener("load", updateVisitorCount);
 </script>
 </body>
 </html>
+
+
