@@ -277,7 +277,7 @@ async function loadMessages() {
     // 복사 버튼 추가
     const copyBtn = document.createElement("button");
     copyBtn.textContent = "복사";
-    copyBtn.style.cssText = "position: absolute; bottom: 15px; left: 10px; font-size: 12px; padding: 4px 8px; border-radius: 6px; background-color: #eee; color: #000; border: none; cursor: pointer;";
+    copyBtn.style.cssText = "position: absolute; bottom: 5px; left: 10px; font-size: 12px; padding: 4px 8px; border-radius: 6px; background-color: #eee; color: #000; border: none; cursor: pointer;";
     copyBtn.onclick = () => {
       // 말머리를 제거한 텍스트 추출
       let raw = inner.innerText.trim();
