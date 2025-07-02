@@ -380,24 +380,14 @@ window.addOrUpdateMessage = addOrUpdateMessage;
 window.showPasswordPrompt = showPasswordPrompt;
 window.filterMessages = filterMessages;
 window.onload = loadMessages;
-</script>
-
-
-
-</body>
-
-<script type="module">
-import { collection, doc, getDoc, setDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
 // 방문자 수 기록
 async function updateVisitorCount() {
   const countDiv = document.getElementById("visitor-count");
   try {
-    // KST 기준 날짜 생성
     const now = new Date();
     const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
     const kst = new Date(utc + (9 * 60 * 60000));
-    const dateStr = kst.toISOString().slice(0, 10); // "YYYY-MM-DD"
+    const dateStr = kst.toISOString().slice(0, 10);
 
     const counterRef = doc(collection(db, "visitors"), dateStr);
     const counterSnap = await getDoc(counterRef);
@@ -418,5 +408,10 @@ async function updateVisitorCount() {
 }
 
 updateVisitorCount();
+
 </script>
+
+
+
+</body>
 </html>
