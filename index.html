@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>[여성시대] 뉴스 시사 라이브 달글 부속</title>
+<title>팩트체크/박찬대 밭갈이 자료💙</title>
 <style>
   body {
     font-family: "Malgun Gothic", sans-serif;
@@ -126,15 +126,10 @@
 </head>
 <body>
 <div class="page-title">
-<div class="main-title">뉴스 시사 라이브 달글 부속</div>
+<div class="main-title">팩트체크/박찬대 밭갈이 자료 모음💙</div>
 <br/>
 <div style="font-size: 12px; color: #333; text-align: center; margin: 0 auto 10px;">
-상호 소통이 가능한 외부 홈페이지는 여성시대 전체 공지 위반이 될 수 있다 생각해서, 달주가 업로드하는 방식으로 제작했습니다.<br/><br/>
-  업로드 요청은 <a href="https://cafe.daum.net/subdued20club/VrjL/940638" target="_blank" style="color: #1a0dab; text-decoration: underline;">
-    https://cafe.daum.net/subdued20club/VrjL/940638
-  </a>
-<br/><br/>
-
+외부 공유 가능합니다.<br><br>
   ‘검찰개혁 4법’ 추석 전 통과를 위한 전국민 백만 서명운동<br/>
   <a href="https://docs.google.com/forms/d/e/1FAIpQLScAiT3buFKXh5-Wagzh3uxNjJnnoZ6lmU8eNShsU-Xpmqmhkg/viewform" target="_blank" style="color: #1a0dab; text-decoration: underline;">
     https://docs.google.com/forms/d/e/1FAIpQLScAiT3buFKXh5-Wagzh3uxNjJnnoZ6lmU8eNShsU-Xpmqmhkg/viewform
@@ -156,7 +151,7 @@
 </div>
 
 <div class="chat-container" id="chatBox"></div>
-<div id="admin-panel"><button onclick="showPasswordPrompt()">🔒 달주 전용</button></div>
+<div id="admin-panel"><button onclick="showPasswordPrompt()">🔒 관리자 전용</button></div>
 
 <div id="visitor-counter" style="text-align:center; margin-top: 10px; font-size: 13px; color: #555;"></div>
 
@@ -242,7 +237,7 @@ async function loadMessages() {
     toggle.addEventListener("click", (event) => {
       event.stopPropagation();
       contentDiv.classList.toggle("expanded");
-      toggle.textContent = contentDiv.classList.contains("expanded") ? "줄임" : "더보기";
+      toggle.textContent = contentDiv.classList.contains("expanded") ? "줄이기" : "더보기";
     });
 
     contentDiv.appendChild(inner);
@@ -260,7 +255,7 @@ async function loadMessages() {
         toggle.addEventListener("click", (event) => {
           event.stopPropagation();
           contentDiv.classList.toggle("expanded");
-          toggle.textContent = contentDiv.classList.contains("expanded") ? "줄임" : "더보기";
+          toggle.textContent = contentDiv.classList.contains("expanded") ? "줄이기" : "더보기";
         });
         contentDiv.appendChild(toggle);
       }
@@ -430,7 +425,7 @@ window.onload = loadMessages;
     const json = await res.json();
     const docs = json.documents || [];
     const todayDocs = docs.filter(d => d.fields.date && d.fields.date.stringValue === today);
-    document.getElementById("visitor-counter").textContent = "📊 오늘 방문자 수: " + todayDocs.length + "명";
+    document.getElementById("visitor-counter").textContent = "오늘 방문자 수: " + todayDocs.length + "명";
   }
 
   window.addEventListener("load", countVisitor);
@@ -438,4 +433,3 @@ window.onload = loadMessages;
 
 </body>
 </html>
-
