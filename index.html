@@ -131,8 +131,6 @@
   margin-bottom: 10px; /* 말머리 아래 여백 */
 }
 
-
-  }
 </style>
 </head>
 <body>
@@ -183,6 +181,13 @@
   방문자 수를 불러오는 중...
 </div>
 
+
+
+
+
+
+
+
 <div id="input-area" style="display:none;">
   <select id="prefix" style="width: 100%; max-width: 500px; margin-bottom: 8px; padding: 6px; font-size: 14px;">
     <option value="">전체 보기</option>
@@ -198,7 +203,6 @@
 <div id="visitor-messages" style="margin-top: 20px;">
   <h4 style="text-align:left; font-size:16px;">📨 방문자 메시지</h4>
 </div>
-<div id="toast">📋 복사</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -278,7 +282,7 @@ async function loadMessages() {
 
 
 const ts = data.timestamp ? data.timestamp.toDate() : new Date();
-const yearShort = String(ts.getFullYear()).slice(2); // '25'
+const yearShort = String(ts.getFullYear()).slice(2); 
 const dateOnly = yearShort + '-' + String(ts.getMonth()+1).padStart(2, '0') + '-' + String(ts.getDate()).padStart(2, '0');
 
 
@@ -327,47 +331,39 @@ const dateOnly = yearShort + '-' + String(ts.getMonth()+1).padStart(2, '0') + '-
       }
     });
 
-
-    // PC 클릭 복사
-    
-
-    
-    
-    
-    
-    // 복사 버튼 추가
     const copyBtn = document.createElement("button");
     copyBtn.textContent = "복사";
     copyBtn.style.cssText = "position: absolute; bottom: 5px; left: 10px; font-size: 12px; padding: 4px 8px; border-radius: 6px; background-color: #eee; color: #000; border: none; cursor: pointer;";
-    copyBtn.onclick = () => {
-      // 말머리를 제거한 텍스트 추출
-
-
-if (raw.startsWith("💡") || raw.startsWith("🔵") || raw.startsWith("🔔") || raw.startsWith("📌")) {
-  raw = raw.substring(raw.indexOf("\n") + 1).trim();
-}
 
 
 
 
-      const textarea = document.createElement("textarea");
-      textarea.value = raw;
-      textarea.setAttribute("readonly", "");
-      textarea.style.position = "absolute";
-      textarea.style.left = "-9999px";
-      document.body.appendChild(textarea);
-      textarea.select();
-      try {
-        document.execCommand("copy");
-        const toast = document.getElementById("toast");
-        toast.textContent = "📋 복사 완료";
-        toast.style.display = "block";
-        setTimeout(() => toast.style.display = "none", 1500);
-      } catch (err) {
-        console.error("복사 실패", err);
-      }
-      document.body.removeChild(textarea);
-    };
+copyBtn.onclick = () => {
+  let raw = inner.innerText.trim();
+
+  if (raw.startsWith("💡") || raw.startsWith("🔵") || raw.startsWith("🔔") || raw.startsWith("📌")) {
+    raw = raw.substring(raw.indexOf("\n") + 1).trim();
+  }
+
+  const textarea = document.createElement("textarea");
+  textarea.value = raw;
+  textarea.setAttribute("readonly", "");
+  textarea.style.position = "absolute";
+  textarea.style.left = "-9999px";
+  document.body.appendChild(textarea);
+  textarea.select();
+  try {
+    document.execCommand("copy");
+    const toast = document.getElementById("toast");
+    toast.textContent = "📋 복사 완료";
+    toast.style.display = "block";
+    setTimeout(() => toast.style.display = "none", 1500);
+  } catch (err) {
+    console.error("복사 실패", err);
+  }
+  document.body.removeChild(textarea);
+};
+
     contentDiv.appendChild(copyBtn);
 
 
@@ -398,7 +394,7 @@ const delBtn = document.createElement("button");
 delBtn.textContent = "삭제";
 delBtn.onclick = async () => {
   const ok = confirm("정말 삭제하시겠습니까?");
-  if (!ok) return; // 사용자가 '아니오'를 누르면 취소
+  if (!ok) return; 
   await deleteDoc(doc(db, "message", id));
   loadMessages();
 };
@@ -414,11 +410,7 @@ delBtn.onclick = async () => {
     container.appendChild(bubble);
   });
   container.scrollTop = container.scrollHeight;
-filterMessages(); // ← 이거 추가!
-// 방문자 메시지 불러오기
-
-
-
+filterMessages(); 
 if (isAdmin) {
   const visitorContainer = document.getElementById("visitor-messages");
   if (visitorContainer) {
@@ -441,7 +433,7 @@ const dateOnly = `${String(ts.getFullYear()).slice(2)}-${String(ts.getMonth()+1)
       bubble.className = "chat-card";
       bubble.style.backgroundColor = "#fff4e6";
 
-bubble.style.position = "relative"; // ← 이 줄은 꼭 있어야 X 버튼 위치가 잡혀요
+bubble.style.position = "relative";
 
 if (isAdmin) {
   const delBtn = document.createElement("div");
@@ -459,7 +451,7 @@ delBtn.onclick = async () => {
   const ok = confirm("정말 삭제하시겠습니까?");
   if (!ok) return;
   await deleteDoc(doc(db, "visitor_requests", id));
-  bubble.remove(); // 삭제된 말풍선을 즉시 화면에서 제거
+  bubble.remove(); 
 };
 
 
@@ -591,7 +583,7 @@ function displayVisitorCount(count) {
   }
 }
 
-countVisitor(); // 페이지 열릴 때 실행
+countVisitor();
 
 
 window.submitVisitorMessage = async function() {
@@ -624,7 +616,6 @@ document.getElementById("uploadRequestBtn").onclick = () => {
 
 </script>
 
-
-
+<div id="toast">📋 복사 완료</div>
 </body>
 </html>
