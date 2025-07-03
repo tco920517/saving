@@ -55,9 +55,7 @@
   position: relative;
   word-wrap: break-word;
   box-sizing: border-box;
-
   text-align: left;}
-
   .timestamp {
     font-size: 12px;
     color: #888;
@@ -123,15 +121,11 @@
   transition: max-height 0.3s ease;
   user-select: text;
   font-size: 12px; /* 본문 내용 폰트 크기 */
-}
-
-.chat-content .inner-text > strong {
+}.chat-content .inner-text > strong {
   font-size: 14px; /* 말머리 크기 */
   display: inline-block;
   margin-bottom: 10px; /* 말머리 아래 여백 */
-}
-
-</style>
+}</style>
 </head>
 <body>
 <div class="page-title">
@@ -143,14 +137,8 @@
   <a href="https://docs.google.com/forms/d/e/1FAIpQLScAiT3buFKXh5-Wagzh3uxNjJnnoZ6lmU8eNShsU-Xpmqmhkg/viewform" target="_blank" style="color: #1a0dab; text-decoration: underline;">서명 링크 이동
   </a><br>
 </div>
-
-
 <br>
-
 <div class="chat-container" id="chatBox"></div>
-
-
-
 <div class="search-bar" style="display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
   <select id="prefixFilter" onchange="filterMessages()" 
     style="flex: 0 0 auto; max-width: 120px; padding: 8px 12px; font-size: 14px; border: 1px solid #ccc; border-radius: 8px;">
@@ -160,34 +148,20 @@
     <option value="🔔 참고">🔔 참고</option>
     <option value="📌 인사 관련">📌 인사 관련</option>
   </select>
-
   <input id="searchInput" oninput="filterMessages()" placeholder="내용 검색" type="text"
     style="flex: 1 1 auto; min-width: 0; padding: 8px 12px; font-size: 14px; font-family: 'Malgun Gothic', sans-serif; border: 1px solid #ccc; border-radius: 8px; max-width: 340px;" />
 </div>
-
-
 <div id="admin-panel" style="display: flex; justify-content: center; gap: 10px;">
 <button id="uploadRequestBtn" style="background-color: #fae100; color: #000; border: none; padding: 8px 12px; border-radius: 6px;">✉️ 업로드 요청</button>
-
   <button onclick="showPasswordPrompt()">🔒 관리자 전용</button>
 </div>
 <div id="visitor-message-box" style="display:none; flex-direction: column; align-items: center; max-width: 500px; margin: 10px auto;">
   <textarea id="visitorMessage" placeholder="관리자에게 업로드 요청할 자료 링크를 주세요.(가급적 로그인 없이 볼 수 있는 자료로)" rows="4" style="width: 100%; padding: 8px; font-size: 14px; font-family: 'Malgun Gothic', sans-serif;"></textarea>
 <button onclick="submitVisitorMessage()" style="background-color: #007bff; color: white; border: none; padding: 8px 12px; border-radius: 6px;">📩 메시지 보내기</button>
-
 </div>
-
 <div id="visit-count" style="text-align:center; font-size:13px; color:#555; margin-top:12px;">
   방문자 수를 불러오는 중...
 </div>
-
-
-
-
-
-
-
-
 <div id="input-area" style="display:none;">
   <select id="prefix" style="width: 100%; max-width: 500px; margin-bottom: 8px; padding: 6px; font-size: 14px;">
     <option value="">전체 보기</option>
@@ -203,7 +177,6 @@
 <div id="visitor-messages" style="margin-top: 20px;">
   <h4 style="text-align:left; font-size:16px;">📨 방문자 메시지</h4>
 </div>
-
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
@@ -220,9 +193,6 @@ import {
   query,
   orderBy
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-
-
 const firebaseConfig = {
   apiKey: "AIzaSyAZHqkGXdH4XxL-0jprA2DB7YO4XhTdNmQ",
   authDomain: "chat-page-6d547.firebaseapp.com",
@@ -231,25 +201,14 @@ const firebaseConfig = {
   messagingSenderId: "1087235341754",
   appId: "1:1087235341754:web:6583340a62f21068b5b183"
 };
-
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-
 let isAdmin = false;
 let editingId = null;
-
-
-
-
-
 async function loadMessages() {
   const container = document.getElementById("chatBox");
   container.innerHTML = "";
   const q = query(collection(db, "message"), orderBy("timestamp", "asc"));
-
-
-
-
   
     function copyTextToClipboard(text) {
       const textarea = document.createElement("textarea");
@@ -269,7 +228,6 @@ async function loadMessages() {
       }
       document.body.removeChild(textarea);
     }
-
   
   const snapshot = await getDocs(q);
   snapshot.forEach(docSnap => {
@@ -277,29 +235,16 @@ async function loadMessages() {
     const id = docSnap.id;
     const msg = data.content;
     const prefix = data.prefix || "";
-
-
-
-
 const ts = data.timestamp ? data.timestamp.toDate() : new Date();
 const yearShort = String(ts.getFullYear()).slice(2); 
 const dateOnly = yearShort + '-' + String(ts.getMonth()+1).padStart(2, '0') + '-' + String(ts.getDate()).padStart(2, '0');
-
-
-
-
-
-
     const bubble = document.createElement("div");
     bubble.className = "chat-card";
-
     const contentDiv = document.createElement("div");
     contentDiv.className = "chat-content preview";
-
     const inner = document.createElement("div");
     inner.className = "inner-text";
     inner.innerHTML = `${prefix ? `<strong>${prefix}</strong><br>` : ""}` + msg.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>').replace(/\n/g, '<br>');
-
     const toggle = document.createElement("div");
     toggle.className = "toggle-more";
     toggle.textContent = "더보기";
@@ -309,13 +254,10 @@ const dateOnly = yearShort + '-' + String(ts.getMonth()+1).padStart(2, '0') + '-
       contentDiv.classList.toggle("expanded");
       toggle.textContent = contentDiv.classList.contains("expanded") ? "줄이기" : "더보기";
     });
-
     contentDiv.appendChild(inner);
-
     requestAnimationFrame(() => {
       const oldToggle = contentDiv.querySelector(".toggle-more");
       if (oldToggle) oldToggle.remove();
-
       const isOverflowed = inner.scrollHeight > inner.clientHeight + 4;
       if (isOverflowed) {
         const toggle = document.createElement("div");
@@ -330,21 +272,14 @@ const dateOnly = yearShort + '-' + String(ts.getMonth()+1).padStart(2, '0') + '-
         contentDiv.appendChild(toggle);
       }
     });
-
     const copyBtn = document.createElement("button");
     copyBtn.textContent = "복사";
     copyBtn.style.cssText = "position: absolute; bottom: 5px; left: 10px; font-size: 12px; padding: 4px 8px; border-radius: 6px; background-color: #eee; color: #000; border: none; cursor: pointer;";
-
-
-
-
 copyBtn.onclick = () => {
   let raw = inner.innerText.trim();
-
   if (raw.startsWith("💡") || raw.startsWith("🔵") || raw.startsWith("🔔") || raw.startsWith("📌")) {
     raw = raw.substring(raw.indexOf("\n") + 1).trim();
   }
-
   const textarea = document.createElement("textarea");
   textarea.value = raw;
   textarea.setAttribute("readonly", "");
@@ -354,29 +289,20 @@ copyBtn.onclick = () => {
   textarea.select();
   try {
     document.execCommand("copy");
-    const toast = document.getElementById("toast");
-    toast.textContent = "📋 복사 완료";
-    toast.style.display = "block";
-    setTimeout(() => toast.style.display = "none", 1500);
+const toast = document.getElementById("toast");
+toast.style.display = "block";
+setTimeout(() => toast.style.display = "none", 1500);
   } catch (err) {
     console.error("복사 실패", err);
   }
   document.body.removeChild(textarea);
 };
-
     contentDiv.appendChild(copyBtn);
-
-
-
-
-
     bubble.appendChild(contentDiv);
-
     const tsDiv = document.createElement("div");
     tsDiv.className = "timestamp";
     tsDiv.textContent = dateOnly;
     bubble.appendChild(tsDiv);
-
     if (isAdmin) {
       const btns = document.createElement("div");
       btns.className = "bubble-buttons";
@@ -388,8 +314,6 @@ copyBtn.onclick = () => {
         document.getElementById("prefix").value = prefix;
         editingId = id;
       };
-
-
 const delBtn = document.createElement("button");
 delBtn.textContent = "삭제";
 delBtn.onclick = async () => {
@@ -398,15 +322,10 @@ delBtn.onclick = async () => {
   await deleteDoc(doc(db, "message", id));
   loadMessages();
 };
-
-
-
-
       btns.appendChild(editBtn);
       btns.appendChild(delBtn);
       bubble.appendChild(btns);
     }
-
     container.appendChild(bubble);
   });
   container.scrollTop = container.scrollHeight;
@@ -415,26 +334,15 @@ if (isAdmin) {
   const visitorContainer = document.getElementById("visitor-messages");
   if (visitorContainer) {
     const visitorSnap = await getDocs(query(collection(db, "visitor_requests"), orderBy("timestamp", "desc")));
-
-
-
     visitorSnap.forEach(docSnap => {
       const data = docSnap.data();
       const ts = data.timestamp ? data.timestamp.toDate() : new Date();
 const id = docSnap.id;
-
-
-
-
 const dateOnly = `${String(ts.getFullYear()).slice(2)}-${String(ts.getMonth()+1).padStart(2, '0')}-${String(ts.getDate()).padStart(2, '0')} ${String(ts.getHours()).padStart(2, '0')}:${String(ts.getMinutes()).padStart(2, '0')}`;
-
-
       const bubble = document.createElement("div");
       bubble.className = "chat-card";
       bubble.style.backgroundColor = "#fff4e6";
-
 bubble.style.position = "relative";
-
 if (isAdmin) {
   const delBtn = document.createElement("div");
   delBtn.textContent = "❌";
@@ -453,32 +361,62 @@ delBtn.onclick = async () => {
   await deleteDoc(doc(db, "visitor_requests", id));
   bubble.remove(); 
 };
-
-
   bubble.appendChild(delBtn);
-}
+}      
 
 
-      const content = document.createElement("div");
-      content.className = "chat-content";
-      content.innerHTML = `<strong>📩 방문자 메시지</strong><br>${data.content.replace(/\n/g, "<br>")}`;
+const content = document.createElement("div");
+content.className = "chat-content";
+
+// 링크 자동 변환 및 줄바꿈
+const linkifiedContent = data.content
+  .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color:#1a0dab; text-decoration: underline;">$1</a>')
+  .replace(/\n/g, "<br>");
+
+content.innerHTML = `<strong>📩 방문자 메시지</strong><br><div class="inner-text">${linkifiedContent}</div>`;
+
+// 복사 버튼 추가
+const copyBtn = document.createElement("button");
+copyBtn.textContent = "복사";
+copyBtn.style.cssText = "position: absolute; bottom: 5px; left: 10px; font-size: 12px; padding: 4px 8px; border-radius: 6px; background-color: #eee; color: #000; border: none; cursor: pointer;";
+
+copyBtn.onclick = () => {
+  const rawText = data.content.trim();
+  const textarea = document.createElement("textarea");
+  textarea.value = rawText;
+  textarea.setAttribute("readonly", "");
+  textarea.style.position = "absolute";
+  textarea.style.left = "-9999px";
+  document.body.appendChild(textarea);
+  textarea.select();
+  try {
+    document.execCommand("copy");
+    const toast = document.getElementById("toast");
+    toast.style.display = "block";
+    setTimeout(() => (toast.style.display = "none"), 1500);
+  } catch (err) {
+    console.error("복사 실패", err);
+  }
+  document.body.removeChild(textarea);
+};
+
+bubble.appendChild(copyBtn);
+
+
+
+
+
+
 
       const tsDiv = document.createElement("div");
       tsDiv.className = "timestamp";
       tsDiv.textContent = dateOnly;
-
       bubble.appendChild(content);
       bubble.appendChild(tsDiv);
       visitorContainer.appendChild(bubble);
     });
   }
-}
-
-
-
-}
-
-async function addOrUpdateMessage() {
+}}async function addOrUpdateMessage() {
   const content = document.getElementById("newMessage").value.trim();
   const prefix = document.getElementById("prefix").value;
   if (!content) return;
@@ -490,13 +428,9 @@ async function addOrUpdateMessage() {
   }
   document.getElementById("newMessage").value = "";
   loadMessages();
-}
-
-
-async function showPasswordPrompt() {
+}async function showPasswordPrompt() {
   const pwd = prompt("비밀번호를 입력하세요");
   if (!pwd) return;
-
   try {
     const docRef = doc(db, "admin", "secret");
     const docSnap = await getDoc(docRef);
@@ -504,7 +438,6 @@ async function showPasswordPrompt() {
       alert("비밀번호 데이터가 존재하지 않습니다.");
       return;
     }
-
     const realPassword = docSnap.data().password;
     if (pwd === realPassword) {
       isAdmin = true;
@@ -517,10 +450,7 @@ async function showPasswordPrompt() {
     console.error("비밀번호 확인 중 오류 발생:", error);
     alert("오류가 발생했습니다.");
   }
-}
-
-
-function filterMessages() {
+}function filterMessages() {
   const queryText = document.getElementById("searchInput").value.toLowerCase();
   const selectedPrefix = document.getElementById("prefixFilter")?.value || "";
   const bubbles = document.querySelectorAll(".chat-card");
@@ -530,25 +460,17 @@ function filterMessages() {
     const textMatch = text.includes(queryText);
     b.style.display = (prefixMatch && textMatch) ? "block" : "none";
   });
-}
-
-window.addOrUpdateMessage = addOrUpdateMessage;
+}window.addOrUpdateMessage = addOrUpdateMessage;
 window.showPasswordPrompt = showPasswordPrompt;
 window.filterMessages = filterMessages;
 window.onload = loadMessages;
-
-
-
-
 async function countVisitor() {
   const todayKey = new Date().toISOString().split('T')[0];
   const visited = localStorage.getItem('visited_' + todayKey);
-
   if (visited) {
     getVisitorCount();
     return;
   }
-
   const counterRef = doc(db, "visit_count", "counter");
   const snap = await getDoc(counterRef);
   if (snap.exists()) {
@@ -559,37 +481,23 @@ async function countVisitor() {
     await setDoc(counterRef, { total: 1 });
     displayVisitorCount(1);
   }
-
   localStorage.setItem('visited_' + todayKey, 'true');
-}
-
-async function getVisitorCount() {
+}async function getVisitorCount() {
   const counterRef = doc(db, "visit_count", "counter");
   const snap = await getDoc(counterRef);
   if (snap.exists()) {
     const current = snap.data().total || 0;
     displayVisitorCount(current);
   }
-}
-
-
-
-
-
-function displayVisitorCount(count) {
+}function displayVisitorCount(count) {
   const visitDiv = document.getElementById("visit-count");
   if (visitDiv) {
     visitDiv.textContent = `총 방문자 수: ${count.toLocaleString()}명`;
   }
-}
-
-countVisitor();
-
-
+}countVisitor();
 window.submitVisitorMessage = async function() {
   const content = document.getElementById("visitorMessage").value.trim();
   if (!content) return alert("메시지를 입력해주세요.");
-
   try {
     await addDoc(collection(db, "visitor_requests"), {
       content,
@@ -603,19 +511,11 @@ window.submitVisitorMessage = async function() {
     alert("전송에 실패했습니다.");
   }
 };
-
 document.getElementById("uploadRequestBtn").onclick = () => {
   const box = document.getElementById("visitor-message-box");
   box.style.display = box.style.display === "none" ? "flex" : "none";
 };
-
-
-
-
-
-
 </script>
-
-<div id="toast">📋 복사 완료</div>
+<div id="toast">📋 복사</div>
 </body>
 </html>
