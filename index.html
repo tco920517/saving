@@ -457,17 +457,29 @@ bubble.appendChild(copyBtn);
     console.error("비밀번호 확인 중 오류 발생:", error);
     alert("오류가 발생했습니다.");
   }
-}function filterMessages() {
+}
+
+
+
+function filterMessages() {
   const queryText = document.getElementById("searchInput").value.toLowerCase();
   const selectedPrefix = document.getElementById("prefixFilter")?.value || "";
   const bubbles = document.querySelectorAll(".chat-card");
+
   bubbles.forEach(b => {
     const text = b.textContent.toLowerCase();
     const prefixMatch = selectedPrefix === "" || text.includes(selectedPrefix.toLowerCase());
     const textMatch = text.includes(queryText);
     b.style.display = (prefixMatch && textMatch) ? "block" : "none";
   });
-}window.addOrUpdateMessage = addOrUpdateMessage;
+
+  // 👇 아래로 스크롤 이동 기능 추가
+  const container = document.getElementById("chatBox");
+  container.scrollTop = container.scrollHeight;
+}
+
+
+window.addOrUpdateMessage = addOrUpdateMessage;
 window.showPasswordPrompt = showPasswordPrompt;
 window.filterMessages = filterMessages;
 window.onload = loadMessages;
