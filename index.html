@@ -331,8 +331,11 @@ delBtn.onclick = async () => {
     }
     container.appendChild(bubble);
   });
-container.scrollTop = previousScrollTop;
+
 filterMessages(); 
+container.scrollTop = container.scrollHeight;
+
+
 if (isAdmin) {
   const visitorContainer = document.getElementById("visitor-messages");
   if (visitorContainer) {
