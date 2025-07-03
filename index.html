@@ -38,13 +38,14 @@
     padding: 10px;
     background-color: #e0f3ff;
     border-radius: 15px;
+    padding-bottom: 20px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   }
   
 .chat-card {
   max-width: 100%;
   padding: 16px;
-  margin: 12px auto;
+  margin: 20px auto;
   border-radius: 12px;
   background-color: #ffffff;
   border: 1px solid #ccc;
@@ -112,15 +113,25 @@
     z-index: 1000;
   }
   .chat-content.preview .inner-text {
-    max-height: 4.5em;
+    max-height: 7.3em;
     overflow: hidden;
   }
   .chat-content.expanded .inner-text {
     max-height: none;
   }
-  .chat-content .inner-text {
-    transition: max-height 0.3s ease;
-    user-select: text;
+.chat-content .inner-text {
+  transition: max-height 0.3s ease;
+  user-select: text;
+  font-size: 12px; /* 본문 내용 폰트 크기 */
+}
+
+.chat-content .inner-text > strong {
+  font-size: 14px; /* 말머리 크기 */
+  display: inline-block;
+  margin-bottom: 10px; /* 말머리 아래 여백 */
+}
+
+
   }
 </style>
 </head>
@@ -245,8 +256,18 @@ async function loadMessages() {
     const id = docSnap.id;
     const msg = data.content;
     const prefix = data.prefix || "";
-    const ts = data.timestamp ? data.timestamp.toDate() : new Date();
-    const dateOnly = ts.getFullYear() + '-' + String(ts.getMonth()+1).padStart(2, '0') + '-' + String(ts.getDate()).padStart(2, '0');
+
+
+
+
+const ts = data.timestamp ? data.timestamp.toDate() : new Date();
+const yearShort = String(ts.getFullYear()).slice(2); // '25'
+const dateOnly = yearShort + '-' + String(ts.getMonth()+1).padStart(2, '0') + '-' + String(ts.getDate()).padStart(2, '0');
+
+
+
+
+
 
     const bubble = document.createElement("div");
     bubble.className = "chat-card";
@@ -330,7 +351,7 @@ async function loadMessages() {
 
 
 
-    contentDiv.appendChild(toggle);
+
     bubble.appendChild(contentDiv);
 
     const tsDiv = document.createElement("div");
