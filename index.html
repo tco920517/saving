@@ -178,7 +178,20 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc, deleteDoc, updateDoc, doc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  addDoc,
+  deleteDoc,
+  updateDoc,
+  doc,
+  serverTimestamp,
+  query,
+  orderBy,
+  getDoc // ← 이 한 줄만 맨 아래에 추가한 거야!
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyAZHqkGXdH4XxL-0jprA2DB7YO4XhTdNmQ",
@@ -362,16 +375,33 @@ async function addOrUpdateMessage() {
   loadMessages();
 }
 
-function showPasswordPrompt() {
+
+async function showPasswordPrompt() {
   const pwd = prompt("비밀번호를 입력하세요");
-  if (pwd === "980324") {
-    isAdmin = true;
-    document.getElementById("input-area").style.display = "block";
-    loadMessages();
-  } else {
-    alert("비밀번호가 틀렸습니다.");
+  if (!pwd) return;
+
+  try {
+    const docRef = doc(db, "admin", "secret");
+    const docSnap = await getDoc(docRef);
+    if (!docSnap.exists()) {
+      alert("비밀번호 데이터가 존재하지 않습니다.");
+      return;
+    }
+
+    const realPassword = docSnap.data().password;
+    if (pwd === realPassword) {
+      isAdmin = true;
+      document.getElementById("input-area").style.display = "block";
+      loadMessages();
+    } else {
+      alert("비밀번호가 틀렸습니다.");
+    }
+  } catch (error) {
+    console.error("비밀번호 확인 중 오류 발생:", error);
+    alert("오류가 발생했습니다.");
   }
 }
+
 
 function filterMessages() {
   const queryText = document.getElementById("searchInput").value.toLowerCase();
