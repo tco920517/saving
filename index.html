@@ -158,11 +158,21 @@
   </select>
 
   <input id="searchInput" oninput="filterMessages()" placeholder="내용 검색" type="text"
-    style="flex: 1 1 auto; min-width: 0; padding: 8px 12px; font-size: 14px; border: 1px solid #ccc; border-radius: 8px; max-width: 340px;" />
+    style="flex: 1 1 auto; min-width: 0; padding: 8px 12px; font-size: 14px; font-family: 'Malgun Gothic', sans-serif;" border: 1px solid #ccc; border-radius: 8px; max-width: 340px;" />
 </div>
 
 <div class="chat-container" id="chatBox"></div>
-<div id="admin-panel"><button onclick="showPasswordPrompt()">🔒 관리자 전용</button></div>
+<div id="admin-panel" style="display: flex; justify-content: center; gap: 10px;">
+<button id="uploadRequestBtn" style="background-color: #fae100; color: #000; border: none; padding: 8px 12px; border-radius: 6px;">✉️ 업로드 요청</button>
+
+  <button onclick="showPasswordPrompt()">🔒 관리자 전용</button>
+</div>
+<div id="visitor-message-box" style="display:none; flex-direction: column; align-items: center; max-width: 500px; margin: 10px auto;">
+  <textarea id="visitorMessage" placeholder="관리자에게 업로드 요청할 자료 링크를 주세요.(가급적 로그인 없이 볼 수 있는 자료로)" rows="4" style="width: 100%; padding: 8px; font-size: 14px; font-family: 'Malgun Gothic', sans-serif;""></textarea>
+<button onclick="submitVisitorMessage()" style="background-color: #007bff; color: white; border: none; padding: 8px 12px; border-radius: 6px;"">📩 메시지 보내기</button>
+
+</div>
+
 <div id="visit-count" style="text-align:center; font-size:13px; color:#555; margin-top:12px;">
   방문자 수를 불러오는 중...
 </div>
@@ -175,21 +185,14 @@
     <option value="🔔 참고">🔔 참고</option>
     <option value="📌 인사 관련">📌 인사 관련</option>
   </select>
-  <textarea id="newMessage" placeholder="내용" rows="3" style="width: 100%; height: 160px; box-sizing: border-box; overflow-y: auto;"></textarea>
+  <textarea id="newMessage" placeholder="내용" rows="3" style="width: 100%; height: 160px; box-sizing: border-box; overflow-y: auto;font-family: 'Malgun Gothic', sans-serif;""></textarea>
   <br/>
   <button onclick="addOrUpdateMessage()">내용 추가</button>
+<hr style="margin: 20px 0; border: none; border-top: 1px solid #ccc;" />
+<div id="visitor-messages" style="margin-top: 20px;">
+  <h4 style="text-align:left; font-size:16px;">📨 방문자 메시지</h4>
 </div>
 <div id="toast">📋 복사</div>
-
-<br><br>
-<div style="font-size: 12px; color: #333; text-align: center; margin: 0 auto 10px;">
-업로드 요청 : 
-  <a href="https://cafe.daum.net/subdued20club/VrjL/940638" target="_blank" style="color: #1a0dab; text-decoration: underline;">링크 이동</a>
-</div>
-
-
-
-
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -225,10 +228,18 @@ const db = getFirestore(app);
 let isAdmin = false;
 let editingId = null;
 
+
+
+
+
 async function loadMessages() {
   const container = document.getElementById("chatBox");
   container.innerHTML = "";
   const q = query(collection(db, "message"), orderBy("timestamp", "asc"));
+
+
+
+
   
     function copyTextToClipboard(text) {
       const textarea = document.createElement("textarea");
@@ -372,8 +383,6 @@ const dateOnly = yearShort + '-' + String(ts.getMonth()+1).padStart(2, '0') + '-
       };
 
 
-
-
 const delBtn = document.createElement("button");
 delBtn.textContent = "삭제";
 delBtn.onclick = async () => {
@@ -395,6 +404,74 @@ delBtn.onclick = async () => {
   });
   container.scrollTop = container.scrollHeight;
 filterMessages(); // ← 이거 추가!
+// 방문자 메시지 불러오기
+
+
+
+if (isAdmin) {
+  const visitorContainer = document.getElementById("visitor-messages");
+  if (visitorContainer) {
+    const visitorSnap = await getDocs(query(collection(db, "visitor_requests"), orderBy("timestamp", "desc")));
+
+
+
+    visitorSnap.forEach(docSnap => {
+      const data = docSnap.data();
+      const ts = data.timestamp ? data.timestamp.toDate() : new Date();
+const id = docSnap.id;
+
+
+
+
+const dateOnly = `${String(ts.getFullYear()).slice(2)}-${String(ts.getMonth()+1).padStart(2, '0')}-${String(ts.getDate()).padStart(2, '0')} ${String(ts.getHours()).padStart(2, '0')}:${String(ts.getMinutes()).padStart(2, '0')}`;
+
+
+      const bubble = document.createElement("div");
+      bubble.className = "chat-card";
+      bubble.style.backgroundColor = "#fff4e6";
+
+bubble.style.position = "relative"; // ← 이 줄은 꼭 있어야 X 버튼 위치가 잡혀요
+
+if (isAdmin) {
+  const delBtn = document.createElement("div");
+  delBtn.textContent = "❌";
+  delBtn.style.cssText = `
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    cursor: pointer;
+    font-size: 14px;
+    color: red;
+  `;
+  delBtn.title = "삭제";
+delBtn.onclick = async () => {
+  const ok = confirm("정말 삭제하시겠습니까?");
+  if (!ok) return;
+  await deleteDoc(doc(db, "visitor_requests", id));
+  bubble.remove(); // 삭제된 말풍선을 즉시 화면에서 제거
+};
+
+
+  bubble.appendChild(delBtn);
+}
+
+
+      const content = document.createElement("div");
+      content.className = "chat-content";
+      content.innerHTML = `<strong>📩 방문자 메시지</strong><br>${data.content.replace(/\n/g, "<br>")}`;
+
+      const tsDiv = document.createElement("div");
+      tsDiv.className = "timestamp";
+      tsDiv.textContent = dateOnly;
+
+      bubble.appendChild(content);
+      bubble.appendChild(tsDiv);
+      visitorContainer.appendChild(bubble);
+    });
+  }
+}
+
+
 
 }
 
@@ -505,6 +582,29 @@ function displayVisitorCount(count) {
 
 countVisitor(); // 페이지 열릴 때 실행
 
+
+window.submitVisitorMessage = async function() {
+  const content = document.getElementById("visitorMessage").value.trim();
+  if (!content) return alert("메시지를 입력해주세요.");
+
+  try {
+    await addDoc(collection(db, "visitor_requests"), {
+      content,
+      timestamp: serverTimestamp()
+    });
+    alert("메시지가 전송되었습니다. 수동 업데이트라서 시간이 좀 걸릴 수 있습니다.");
+    document.getElementById("visitorMessage").value = "";
+    document.getElementById("visitor-message-box").style.display = "none";
+  } catch (e) {
+    console.error("메시지 전송 실패:", e);
+    alert("전송에 실패했습니다.");
+  }
+};
+
+document.getElementById("uploadRequestBtn").onclick = () => {
+  const box = document.getElementById("visitor-message-box");
+  box.style.display = box.style.display === "none" ? "flex" : "none";
+};
 
 
 
