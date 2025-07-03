@@ -140,14 +140,20 @@
 <div class="main-title">이재명 정부 성공을 위한 자료 모음 💙</div>
 <br/>
 <div style="font-size: 12px; color: #333; text-align: center; margin: 0 auto 10px;">
-외부 공유 가능합니다.<br><br>
+외부 공유 하셔도 됩니다.<br>
   ‘검찰개혁 4법’ 추석 전 통과를 위한 전국민 백만 서명운동 - 
   <a href="https://docs.google.com/forms/d/e/1FAIpQLScAiT3buFKXh5-Wagzh3uxNjJnnoZ6lmU8eNShsU-Xpmqmhkg/viewform" target="_blank" style="color: #1a0dab; text-decoration: underline;">서명 링크 이동
-  </a>
+  </a><br>
 </div>
 
 
-  <div class="search-bar" style="display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
+<br>
+
+<div class="chat-container" id="chatBox"></div>
+
+
+
+<div class="search-bar" style="display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
   <select id="prefixFilter" onchange="filterMessages()" 
     style="flex: 0 0 auto; max-width: 120px; padding: 8px 12px; font-size: 14px; border: 1px solid #ccc; border-radius: 8px;">
     <option value="">전체 보기</option>
@@ -158,18 +164,18 @@
   </select>
 
   <input id="searchInput" oninput="filterMessages()" placeholder="내용 검색" type="text"
-    style="flex: 1 1 auto; min-width: 0; padding: 8px 12px; font-size: 14px; font-family: 'Malgun Gothic', sans-serif;" border: 1px solid #ccc; border-radius: 8px; max-width: 340px;" />
+    style="flex: 1 1 auto; min-width: 0; padding: 8px 12px; font-size: 14px; font-family: 'Malgun Gothic', sans-serif; border: 1px solid #ccc; border-radius: 8px; max-width: 340px;" />
 </div>
 
-<div class="chat-container" id="chatBox"></div>
+
 <div id="admin-panel" style="display: flex; justify-content: center; gap: 10px;">
 <button id="uploadRequestBtn" style="background-color: #fae100; color: #000; border: none; padding: 8px 12px; border-radius: 6px;">✉️ 업로드 요청</button>
 
   <button onclick="showPasswordPrompt()">🔒 관리자 전용</button>
 </div>
 <div id="visitor-message-box" style="display:none; flex-direction: column; align-items: center; max-width: 500px; margin: 10px auto;">
-  <textarea id="visitorMessage" placeholder="관리자에게 업로드 요청할 자료 링크를 주세요.(가급적 로그인 없이 볼 수 있는 자료로)" rows="4" style="width: 100%; padding: 8px; font-size: 14px; font-family: 'Malgun Gothic', sans-serif;""></textarea>
-<button onclick="submitVisitorMessage()" style="background-color: #007bff; color: white; border: none; padding: 8px 12px; border-radius: 6px;"">📩 메시지 보내기</button>
+  <textarea id="visitorMessage" placeholder="관리자에게 업로드 요청할 자료 링크를 주세요.(가급적 로그인 없이 볼 수 있는 자료로)" rows="4" style="width: 100%; padding: 8px; font-size: 14px; font-family: 'Malgun Gothic', sans-serif;"></textarea>
+<button onclick="submitVisitorMessage()" style="background-color: #007bff; color: white; border: none; padding: 8px 12px; border-radius: 6px;">📩 메시지 보내기</button>
 
 </div>
 
@@ -185,7 +191,7 @@
     <option value="🔔 참고">🔔 참고</option>
     <option value="📌 인사 관련">📌 인사 관련</option>
   </select>
-  <textarea id="newMessage" placeholder="내용" rows="3" style="width: 100%; height: 160px; box-sizing: border-box; overflow-y: auto;font-family: 'Malgun Gothic', sans-serif;""></textarea>
+  <textarea id="newMessage" placeholder="내용" rows="3" style="width: 100%; height: 160px; box-sizing: border-box; overflow-y: auto;font-family: 'Malgun Gothic', sans-serif;"></textarea>
   <br/>
   <button onclick="addOrUpdateMessage()">내용 추가</button>
 <hr style="margin: 20px 0; border: none; border-top: 1px solid #ccc;" />
@@ -335,10 +341,15 @@ const dateOnly = yearShort + '-' + String(ts.getMonth()+1).padStart(2, '0') + '-
     copyBtn.style.cssText = "position: absolute; bottom: 5px; left: 10px; font-size: 12px; padding: 4px 8px; border-radius: 6px; background-color: #eee; color: #000; border: none; cursor: pointer;";
     copyBtn.onclick = () => {
       // 말머리를 제거한 텍스트 추출
-      let raw = inner.innerText.trim();
-      if (raw.startsWith("💡") || raw.startsWith("🔵") || raw.startsWith("🔔")) {
-        raw = raw.substring(raw.indexOf("\n") + 1).trim();
-      }
+
+
+if (raw.startsWith("💡") || raw.startsWith("🔵") || raw.startsWith("🔔") || raw.startsWith("📌")) {
+  raw = raw.substring(raw.indexOf("\n") + 1).trim();
+}
+
+
+
+
       const textarea = document.createElement("textarea");
       textarea.value = raw;
       textarea.setAttribute("readonly", "");
