@@ -523,10 +523,13 @@ document.getElementById("uploadRequestBtn").onclick = () => {
   box.style.display = box.style.display === "none" ? "flex" : "none";
 };
 </script>
+
+
+
 <button onclick="scrollToBottom()" id="scrollBottomBtn" style="
   position: fixed;
-  right: 16px;
-  bottom: 80px;
+  left: 16px;
+  top: 16px;
   z-index: 999;
   padding: 10px 14px;
   font-size: 14px;
@@ -536,13 +539,29 @@ document.getElementById("uploadRequestBtn").onclick = () => {
   color: white;
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
   cursor: pointer;
-">⬇️ 맨 아래</button>
+">▼ 맨 아래</button>
+
+
+
 
 <script>
   function scrollToBottom() {
     window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
   }
 </script>
+<script>
+  // 페이지가 다 로딩되면 실행됨
+  window.addEventListener("DOMContentLoaded", () => {
+    const scrollBtn = document.getElementById("scrollBottomBtn");
+    if (scrollBtn) {
+      scrollBtn.style.display = "block";         // 혹시라도 숨겨져 있으면 다시 보이게 설정
+      document.body.appendChild(scrollBtn);      // 버튼을 body 맨 끝에 붙여서 다른 요소에 안 가려지게
+    }
+  });
+</script>
+
+
+
 
 </body>
 </html>
