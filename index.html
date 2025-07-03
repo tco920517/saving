@@ -139,7 +139,7 @@
   <div class="search-bar" style="display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
   <select id="prefixFilter" onchange="filterMessages()" 
     style="flex: 0 0 auto; max-width: 120px; padding: 8px 12px; font-size: 14px; border: 1px solid #ccc; border-radius: 8px;">
-    <option value="">전체 말머리</option>
+    <option value="">전체 보기</option>
     <option value="💡 팩트 정리">💡 팩트 정리</option>
     <option value="🔵 박찬대 밭갈이용">🔵 박찬대 밭갈이용</option>
     <option value="🔔 참고">🔔 참고</option>
@@ -154,7 +154,7 @@
 <div id="admin-panel"><button onclick="showPasswordPrompt()">🔒 관리자 전용</button></div>
 <div id="input-area" style="display:none;">
   <select id="prefix" style="width: 100%; max-width: 500px; margin-bottom: 8px; padding: 6px; font-size: 14px;">
-    <option value="">말머리 없음</option>
+    <option value="">전체 보기</option>
     <option value="💡 팩트 정리">💡 팩트 정리</option>
     <option value="🔵 박찬대 밭갈이용">🔵 박찬대 밭갈이용</option>
     <option value="🔔 참고">🔔 참고</option>
@@ -345,12 +345,22 @@ async function loadMessages() {
         document.getElementById("prefix").value = prefix;
         editingId = id;
       };
-      const delBtn = document.createElement("button");
-      delBtn.textContent = "삭제";
-      delBtn.onclick = async () => {
-        await deleteDoc(doc(db, "message", id));
-        loadMessages();
-      };
+
+
+
+
+const delBtn = document.createElement("button");
+delBtn.textContent = "삭제";
+delBtn.onclick = async () => {
+  const ok = confirm("정말 삭제하시겠습니까?");
+  if (!ok) return; // 사용자가 '아니오'를 누르면 취소
+  await deleteDoc(doc(db, "message", id));
+  loadMessages();
+};
+
+
+
+
       btns.appendChild(editBtn);
       btns.appendChild(delBtn);
       bubble.appendChild(btns);
@@ -359,6 +369,7 @@ async function loadMessages() {
     container.appendChild(bubble);
   });
   container.scrollTop = container.scrollHeight;
+filterMessages(); // ← 이거 추가!
 
 }
 
@@ -373,7 +384,6 @@ async function addOrUpdateMessage() {
     await addDoc(collection(db, "message"), { content, prefix, timestamp: serverTimestamp() });
   }
   document.getElementById("newMessage").value = "";
-  document.getElementById("prefix").value = "";
   loadMessages();
 }
 
