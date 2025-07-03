@@ -205,9 +205,12 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 let isAdmin = false;
 let editingId = null;
+
 async function loadMessages() {
   const container = document.getElementById("chatBox");
+const previousScrollTop = container.scrollTop;
   container.innerHTML = "";
+
   const q = query(collection(db, "message"), orderBy("timestamp", "asc"));
   
     function copyTextToClipboard(text) {
@@ -328,7 +331,7 @@ delBtn.onclick = async () => {
     }
     container.appendChild(bubble);
   });
-  container.scrollTop = container.scrollHeight;
+container.scrollTop = previousScrollTop;
 filterMessages(); 
 if (isAdmin) {
   const visitorContainer = document.getElementById("visitor-messages");
