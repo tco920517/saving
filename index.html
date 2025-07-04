@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>이재명 정부 성공을 위한 자료 모음 💙</title>
+<title>민주주의를 위한 자료 모음 💙</title>
 <style>
   body {
     font-family: "Malgun Gothic", sans-serif;
@@ -130,7 +130,7 @@
 <body>
 <div id="toast">📋 복사</div>
 <div class="page-title">
-<div class="main-title">이재명 정부 성공을 위한 자료 모음 💙</div>
+<div class="main-title">민주주의를 위한 자료 모음 💙</div>
 <br/>
 <div class="chat-container" id="chatBox"></div>
 <div class="search-bar" style="display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
@@ -478,16 +478,28 @@ function filterMessages() {
 
 window.addOrUpdateMessage = addOrUpdateMessage;
 window.showPasswordPrompt = showPasswordPrompt;
+function getKSTDateKey() {
+  const now = new Date();
+  const kstOffset = 9 * 60 * 60 * 1000; // 한국은 UTC+9
+  const kstNow = new Date(now.getTime() + kstOffset);
+  return kstNow.toISOString().split('T')[0];
+}
+
 window.filterMessages = filterMessages;
 window.onload = loadMessages;
+
+
+
+
 async function countVisitor() {
-  const todayKey = new Date().toISOString().split('T')[0];
+  const todayKey = getKSTDateKey(); // 한국 시간 기준 날짜 키
   const visited = localStorage.getItem('visited_' + todayKey);
   if (visited) {
-    getVisitorCount();
+    getVisitorCount(todayKey); // ✅ 날짜 넘겨줌 (함수도 변경했기 때문)
     return;
   }
-  const counterRef = doc(db, "visit_count", "counter");
+
+  const counterRef = doc(db, "visit_count", todayKey); // ✅ 날짜별로 저장
   const snap = await getDoc(counterRef);
   if (snap.exists()) {
     const current = snap.data().total || 0;
@@ -497,15 +509,23 @@ async function countVisitor() {
     await setDoc(counterRef, { total: 1 });
     displayVisitorCount(1);
   }
+
   localStorage.setItem('visited_' + todayKey, 'true');
-}async function getVisitorCount() {
-  const counterRef = doc(db, "visit_count", "counter");
+}
+
+async function getVisitorCount(todayKey) {
+  const counterRef = doc(db, "visit_count", todayKey); // 날짜별 문서로 조회
   const snap = await getDoc(counterRef);
   if (snap.exists()) {
     const current = snap.data().total || 0;
     displayVisitorCount(current);
+  } else {
+    displayVisitorCount(0); // 오늘 기록이 아직 없을 경우
   }
-}function displayVisitorCount(count) {
+}
+
+
+function displayVisitorCount(count) {
   const visitDiv = document.getElementById("visit-count");
   if (visitDiv) {
     visitDiv.textContent = `총 방문자 수: ${count.toLocaleString()}명`;
