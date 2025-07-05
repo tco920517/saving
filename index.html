@@ -264,9 +264,11 @@ const dateOnly = yearShort + '-' + String(ts.getMonth()+1).padStart(2, '0') + '-
 
 inner.innerHTML = `${prefix ? `<strong>${prefix}</strong><br>` : ""}` + 
   msg
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')  // ★ 추가
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')  // 굵게
+    .replace(/~~(.+?)~~/g, '<span style="font-size: 12px; color: #888;">$1</span>')  // ★ 회색+작게
     .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>')
     .replace(/\n/g, '<br>');
+
 
 
 
