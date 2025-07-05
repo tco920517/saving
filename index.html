@@ -261,13 +261,32 @@ const dateOnly = yearShort + '-' + String(ts.getMonth()+1).padStart(2, '0') + '-
     inner.className = "inner-text";
 
 
+const keywordStyles = [
+  { word: "[박찬대 지지]", color: "#007bff" },     // 파란색
+  { word: "밭갈이 경험 꿀팁)", color: "#28a745" }, // 초록색
+  { word: "밭갈이 사례)", color: "#6f42c1" }       // 보라색
+];
+
+function escapeRegExp(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+let highlightedMsg = msg;
+keywordStyles.forEach(({ word, color }) => {
+  const regex = new RegExp(escapeRegExp(word), 'g');
+  highlightedMsg = highlightedMsg.replace(
+    regex,
+    `<span style="font-weight: bold; color: ${color}; font-size: 13px;">${word}</span>`
+  );
+});
 
 inner.innerHTML = `${prefix ? `<strong>${prefix}</strong><br>` : ""}` + 
-  msg
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')  // 굵게
-    .replace(/~~(.+?)~~/g, '<span style="font-size: 12px; color: #888;">$1</span>')  // ★ 회색+작게
+  highlightedMsg
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/~~(.+?)~~/g, '<span style="font-size: 12px; color: #888;">$1</span>')
     .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>')
     .replace(/\n/g, '<br>');
+
 
 
 
