@@ -504,22 +504,42 @@ bubble.appendChild(copyBtn);
 
 
 
+
+
 function filterMessages() {
-  const queryText = document.getElementById("searchInput").value.toLowerCase();
+  const queryText = document.getElementById("searchInput").value.toLowerCase().trim();
   const selectedPrefix = document.getElementById("prefixFilter")?.value || "";
   const bubbles = document.querySelectorAll(".chat-card");
+
+  // 검색어를 공백 기준으로 분리
+  const searchTokens = queryText.split(/\s+/).filter(Boolean);
 
   bubbles.forEach(b => {
     const text = b.textContent.toLowerCase();
     const prefixMatch = selectedPrefix === "" || text.includes(selectedPrefix.toLowerCase());
-    const textMatch = text.includes(queryText);
+
+    // 입력된 단어들이 순서대로 포함되어 있는지 확인
+    let lastIndex = -1;
+    let textMatch = true;
+    for (const token of searchTokens) {
+      const index = text.indexOf(token, lastIndex + 1);
+      if (index === -1) {
+        textMatch = false;
+        break;
+      }
+      lastIndex = index;
+    }
+
     b.style.display = (prefixMatch && textMatch) ? "block" : "none";
   });
 
-  // 👇 아래로 스크롤 이동 기능 추가
   const container = document.getElementById("chatBox");
   container.scrollTop = container.scrollHeight;
 }
+
+
+
+
 
 
 window.addOrUpdateMessage = addOrUpdateMessage;
