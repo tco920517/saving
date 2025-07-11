@@ -165,16 +165,18 @@
 <div style="text-align:center; font-size:20px; margin-bottom:10px;">
   <strong class="sparkling-text">외부 공유 환영</strong>
 </div>
+<!-- ✅ 1. 항상 보이게 할 status-bar (visitor-message-box 바깥에 위치) -->
+<div id="status-bar" style="display:flex; justify-content:center; gap:20px; font-size:13px; color:#555; margin-top:12px;">
+  <div id="upload-count">오늘 업로드 요청을 불러오는 중...</div>
+  <div id="visit-count">방문자 수를 불러오는 중...</div>
+</div>
 
-
-
+<!-- ✅ 2. 기본적으로 숨겨지는 업로드 요청 박스 -->
 <div id="visitor-message-box" style="display:none; flex-direction: column; align-items: center; max-width: 500px; margin: 10px auto;">
   <textarea id="visitorMessage" placeholder="관리자에게 업로드 요청할 자료 링크를 주세요.(가급적 로그인 없이 볼 수 있는 자료로)" rows="4" style="width: 100%; padding: 8px; font-size: 14px; font-family: 'Malgun Gothic', sans-serif;"></textarea>
-<button onclick="submitVisitorMessage()" style="background-color: #007bff; color: white; border: none; padding: 8px 12px; border-radius: 6px;">📩 메시지 보내기</button>
+  <button onclick="submitVisitorMessage()" style="background-color: #007bff; color: white; border: none; padding: 8px 12px; border-radius: 6px;">📩 메시지 보내기</button>
 </div>
-<div id="visit-count" style="text-align:center; font-size:13px; color:#555; margin-top:12px;">
-  방문자 수를 불러오는 중...
-</div>
+
 <div id="input-area" style="display:none;">
   <select id="prefix" style="width: 100%; max-width: 500px; margin-bottom: 8px; padding: 6px; font-size: 14px;">
     <option value="">전체 보기</option>
@@ -554,7 +556,12 @@ function getKSTDateKey() {
 }
 
 window.filterMessages = filterMessages;
-window.onload = loadMessages;
+window.onload = () => {
+  loadMessages();
+  countVisitor();
+  countTodayUploadRequests();
+};
+
 
 
 
@@ -619,6 +626,28 @@ document.getElementById("uploadRequestBtn").onclick = () => {
   const box = document.getElementById("visitor-message-box");
   box.style.display = box.style.display === "none" ? "flex" : "none";
 };
+async function countTodayUploadRequests() {
+  const todayKey = getKSTDateKey(); // YYYY-MM-DD
+  const start = new Date(`${todayKey}T00:00:00+09:00`);
+  const end = new Date(`${todayKey}T23:59:59+09:00`);
+
+  const q = query(collection(db, "visitor_requests"));
+  const snapshot = await getDocs(q);
+
+  let count = 0;
+  snapshot.forEach(docSnap => {
+    const ts = docSnap.data().timestamp?.toDate();
+    if (ts && ts >= start && ts <= end) {
+      count++;
+    }
+  });
+
+  const countDiv = document.getElementById("upload-count");
+  if (countDiv) {
+    countDiv.textContent = `오늘 업로드 요청: ${count.toLocaleString()}건`;
+  }
+}
+
 </script>
 
 </body>
