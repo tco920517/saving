@@ -327,9 +327,16 @@ inner.innerHTML = `${prefix ? `<strong>${prefix}</strong><br>` : ""}` +
     copyBtn.style.cssText = "position: absolute; bottom: 5px; left: 10px; font-size: 12px; padding: 4px 8px; border-radius: 6px; background-color: #eee; color: #000; border: none; cursor: pointer;";
 copyBtn.onclick = () => {
   let raw = inner.innerText.trim();
-  if (raw.startsWith("💡") || raw.startsWith("🔵") || raw.startsWith("🔔") || raw.startsWith("📌")) {
-    raw = raw.substring(raw.indexOf("\n") + 1).trim();
-  }
+if (
+  raw.startsWith("💡") ||
+  raw.startsWith("🔵") ||
+  raw.startsWith("🔔") ||
+  raw.startsWith("📌") ||
+  raw.startsWith("✨")
+) {
+  raw = raw.substring(raw.indexOf("\n") + 1).trim();
+}
+
   const textarea = document.createElement("textarea");
   textarea.value = raw;
   textarea.setAttribute("readonly", "");
