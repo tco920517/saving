@@ -609,7 +609,7 @@ async function getVisitorCount(todayKey) {
 function displayVisitorCount(count) {
   const visitDiv = document.getElementById("visit-count");
   if (visitDiv) {
-    visitDiv.textContent = `총 방문자 수: ${count.toLocaleString()}명`;
+    visitDiv.textContent = `오늘 방문자 수: ${count.toLocaleString()}명`;
   }
 }countVisitor();
 window.submitVisitorMessage = async function() {
@@ -620,12 +620,12 @@ window.submitVisitorMessage = async function() {
       content,
       timestamp: serverTimestamp()
     });
-    alert("메시지가 전송되었습니다. 수동 업데이트라서 시간이 좀 걸릴 수 있습니다.");
+    alert("전송 완료. 수동 업데이트이니 조금만 기다려 주세요.");
     document.getElementById("visitorMessage").value = "";
     document.getElementById("visitor-message-box").style.display = "none";
   } catch (e) {
-    console.error("메시지 전송 실패:", e);
-    alert("전송에 실패했습니다.");
+    console.error("전송 실패", e);
+    alert("전송 실패");
   }
 };
 document.getElementById("uploadRequestBtn").onclick = () => {
