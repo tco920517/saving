@@ -334,8 +334,10 @@ if (
   raw.startsWith("🔵") ||
   raw.startsWith("🔔") ||
   raw.startsWith("📌") ||
-  raw.startsWith("✨")
+  raw.startsWith("✨") ||
+  raw.startsWith("💬")
 ) {
+
   raw = raw.substring(raw.indexOf("\n") + 1).trim();
 }
 
