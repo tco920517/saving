@@ -327,19 +327,36 @@ inner.innerHTML = `${prefix ? `<strong>${prefix}</strong><br>` : ""}` +
     const copyBtn = document.createElement("button");
     copyBtn.textContent = "복사";
     copyBtn.style.cssText = "position: absolute; bottom: 5px; left: 10px; font-size: 12px; padding: 4px 8px; border-radius: 6px; background-color: #eee; color: #000; border: none; cursor: pointer;";
+
+
+
+
+
+
+
+
 copyBtn.onclick = () => {
   let raw = inner.innerText.trim();
-if (
-  raw.startsWith("💎") ||
-  raw.startsWith("🔵") ||
-  raw.startsWith("🔔") ||
-  raw.startsWith("📌") ||
-  raw.startsWith("✨") ||
-  raw.startsWith("💬")
-) {
 
-  raw = raw.substring(raw.indexOf("\n") + 1).trim();
-}
+  // 말머리 제거
+  if (
+    raw.startsWith("💎") ||
+    raw.startsWith("🔵") ||
+    raw.startsWith("🔔") ||
+    raw.startsWith("📌") ||
+    raw.startsWith("✨") ||
+    raw.startsWith("💬")
+  ) {
+    raw = raw.substring(raw.indexOf("\n") + 1).trim();
+  }
+
+  // 💬채팅용 한 줄인 경우: 한 줄만 랜덤으로 복사
+  if (prefix === "💬채팅용 한 줄") {
+    const lines = raw.split("\n").filter(line => line.trim() !== "");
+    if (lines.length > 0) {
+      raw = lines[Math.floor(Math.random() * lines.length)];
+    }
+  }
 
   const textarea = document.createElement("textarea");
   textarea.value = raw;
@@ -350,14 +367,24 @@ if (
   textarea.select();
   try {
     document.execCommand("copy");
-const toast = document.getElementById("toast");
-toast.style.display = "block";
-setTimeout(() => toast.style.display = "none", 1500);
+    const toast = document.getElementById("toast");
+    toast.style.display = "block";
+    setTimeout(() => toast.style.display = "none", 1500);
   } catch (err) {
     console.error("복사 실패", err);
   }
   document.body.removeChild(textarea);
 };
+
+
+
+
+
+
+
+
+
+
     contentDiv.appendChild(copyBtn);
     bubble.appendChild(contentDiv);
     const tsDiv = document.createElement("div");
