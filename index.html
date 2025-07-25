@@ -131,7 +131,7 @@
 .chat-content .inner-text > strong {
   font-size: 14px;
   display: inline-block;
-  margin-bottom: 10px;
+  margin-bottom: 16px;
   /* 밑줄 제거 */
 }
 
@@ -314,27 +314,21 @@ keywordStyles.forEach(({ word, color }) => {
 
 
 
-
 let formattedMsg = "";
 
 if (prefix === "💬채팅용 한 줄(랜덤 복사)") {
   const lines = highlightedMsg.split('\n');
   formattedMsg = lines.map((line, idx) => {
-    const color = idx % 2 === 0 ? '#000000' : '#888888'; // 홀수 줄은 검정, 짝수 줄은 회색
+    const color = idx % 2 === 0 ? '#000000' : '#888888'; // 홀수 줄 검정, 짝수 줄 회색
     return `<span style="color: ${color};">${line}</span>`;
   }).join('<br>');
 } else {
-  formattedMsg = highlightedMsg.replace(/\n/g, '<br>');
+  formattedMsg = highlightedMsg
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/~~(.+?)~~/g, '<span style="font-size: 12px; color: #888;">$1</span>')
+    .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>')
+    .replace(/\n/g, '<br>');
 }
-
-// 공통 후처리
-
-formattedMsg = highlightedMsg
-  .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-  .replace(/~~(.+?)~~/g, '<span style="font-size: 12px; color: #888;">$1</span>')
-  .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>')
-  .replace(/\n/g, '<br>'); // 🔥 이 줄 추가!
-
 
 
 
