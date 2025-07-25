@@ -289,6 +289,7 @@ const keywordStyles = [
   { word: "[함께하는 사람들]", color: "#28a745" }, // 초록색
   { word: "[정보]", color: "#6f42c1" },          // 보라색
   { word: "[밭갈이]", color: "#dc3545" },          // 빨강색
+  { word: "[인사 관련]", color: "#dc3545" },          // 빨강색
 ];
 
 function escapeRegExp(str) {
@@ -320,10 +321,16 @@ if (prefix === "💬채팅용 한 줄(랜덤 복사)") {
 }
 
 // 공통 후처리
-formattedMsg = formattedMsg
+
+formattedMsg = highlightedMsg
   .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
   .replace(/~~(.+?)~~/g, '<span style="font-size: 12px; color: #888;">$1</span>')
-  .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
+  .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>')
+  .replace(/\n/g, '<br>'); // 🔥 이 줄 추가!
+
+
+
+
 
 inner.innerHTML = `${prefix ? `<strong class="prefix-tag">${prefix}</strong><br>` : ""}` + formattedMsg;
 
@@ -498,9 +505,13 @@ const content = document.createElement("div");
 content.className = "chat-content";
 
 // 링크 자동 변환 및 줄바꿈
+
+
 const linkifiedContent = data.content
-  .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color:#1a0dab; text-decoration: underline;">$1</a>')
+  .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" style="color:#1a0dab; text-decoration: underline;">$1</a>')  // 수정됨
   .replace(/\n/g, "<br>");
+
+
 
 content.innerHTML = `<strong>📩 방문자 메시지</strong><br><div class="inner-text">${linkifiedContent}</div>`;
 
