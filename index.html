@@ -121,11 +121,28 @@
   transition: max-height 0.3s ease;
   user-select: text;
   font-size: 12px; /* 본문 내용 폰트 크기 */
-}.chat-content .inner-text > strong {
-  font-size: 14px; /* 말머리 크기 */
-  display: inline-block;
-  margin-bottom: 10px; /* 말머리 아래 여백 */
 }
+.chat-content .inner-text strong:not(.prefix-tag) {
+  margin-bottom: 0;
+  display: inline;         /* 인라인 요소로 강제 */
+  line-height: normal;     /* 라인 박스 높이 최소화 */
+}
+
+.chat-content .inner-text > strong {
+  font-size: 14px;
+  display: inline-block;
+  margin-bottom: 10px;
+  /* 밑줄 제거 */
+}
+
+/* 말머리에만 선 적용 */
+.prefix-tag {
+  border-bottom: 1px dashed #ccc;
+  padding-bottom: 2px;
+}
+
+
+
 @keyframes sparkle {
   0%   { opacity: 1; text-shadow: 0 0 5px #3399ff; }
   50%  { opacity: 0.6; text-shadow: 0 0 12px #66ccff; }
@@ -308,7 +325,8 @@ formattedMsg = formattedMsg
   .replace(/~~(.+?)~~/g, '<span style="font-size: 12px; color: #888;">$1</span>')
   .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
 
-inner.innerHTML = `${prefix ? `<strong>${prefix}</strong><br>` : ""}` + formattedMsg;
+inner.innerHTML = `${prefix ? `<strong class="prefix-tag">${prefix}</strong><br>` : ""}` + formattedMsg;
+
 
 
 
