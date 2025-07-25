@@ -197,6 +197,8 @@
 </div>
 
 <div id="input-area" style="display:none;">
+<div id="keyword-style-guide" style="margin-bottom: 12px; font-size: 13px; text-align: left;"></div>
+
   <select id="prefix" style="width: 100%; max-width: 500px; margin-bottom: 8px; padding: 6px; font-size: 14px;">
     <option value="">전체 보기</option>
     <option value="📣 팩트 체크">📣 팩트 체크</option>
@@ -215,6 +217,7 @@
   <h4 style="text-align:left; font-size:16px;">📨 방문자 메시지</h4>
 </div>
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
   getFirestore,
@@ -289,7 +292,9 @@ const dateOnly = yearShort + '-' + String(ts.getMonth()+1).padStart(2, '0') + '-
 const keywordStyles = [
   { word: "[지지 선언]", color: "#007bff" },     // 파란색
   { word: "[함께하는 사람들]", color: "#28a745" }, // 초록색
+  { word: "[정책]", color: "#28a745" }, // 초록색
   { word: "[정보]", color: "#6f42c1" },          // 보라색
+  { word: "[이재명]", color: "#6f42c1" },          // 보라색
   { word: "[밭갈이]", color: "#dc3545" },          // 빨강색
   { word: "[인사 관련]", color: "#dc3545" },          // 빨강색
 ];
@@ -558,7 +563,33 @@ bubble.appendChild(copyBtn);
       visitorContainer.appendChild(bubble);
     });
   }
-}}async function addOrUpdateMessage() {
+}}
+function renderKeywordGuide() {
+  const keywordStyles = [
+    { word: "[지지 선언]", color: "#007bff" },
+    { word: "[함께하는 사람들]", color: "#28a745" },
+    { word: "[정책]", color: "#28a745" },
+    { word: "[정보]", color: "#6f42c1" },
+    { word: "[이재명]", color: "#6f42c1" },
+    { word: "[밭갈이]", color: "#dc3545" },
+    { word: "[인사 관련]", color: "#dc3545" }
+  ];
+
+  const container = document.getElementById("keyword-style-guide");
+  if (!container) return;
+
+  const html = keywordStyles.map(({ word, color }) =>
+    `<span 
+       style="color: ${color}; font-weight: bold; margin-right: 8px; cursor: pointer;" 
+       onclick="insertKeyword('${word}')"
+     >${word}</span>`
+  ).join(" ");
+
+  container.innerHTML = `<div style="margin-bottom: 4px;"><strong>✅ 강조 단어 미리보기:</strong></div>${html}`;
+}
+
+
+async function addOrUpdateMessage() {
   const content = document.getElementById("newMessage").value.trim();
   const prefix = document.getElementById("prefix").value;
   if (!content) return;
@@ -584,6 +615,7 @@ bubble.appendChild(copyBtn);
     if (pwd === realPassword) {
       isAdmin = true;
       document.getElementById("input-area").style.display = "block";
+renderKeywordGuide();
       loadMessages();
     } else {
       alert("비밀번호가 틀렸습니다.");
@@ -729,6 +761,30 @@ async function countTodayUploadRequests() {
       count++;
     }
   });
+function insertKeyword(word) {
+  const textarea = document.getElementById("newMessage");
+  if (!textarea) return;
+
+  // 커서 위치
+  const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+
+  // 기존 내용
+  const text = textarea.value;
+
+  // 삽입
+  const before = text.substring(0, start);
+  const after = text.substring(end);
+
+  // 갱신
+  textarea.value = before + word + after;
+
+  // 커서 위치 업데이트
+  textarea.focus();
+  textarea.selectionStart = textarea.selectionEnd = start + word.length;
+}
+window.insertKeyword = insertKeyword;
+
 
   const countDiv = document.getElementById("upload-count");
   if (countDiv) {
