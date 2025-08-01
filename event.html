@@ -200,6 +200,7 @@
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+
 import {
   getFirestore,
   collection,
@@ -209,8 +210,12 @@ import {
   doc,
   getDoc,
   updateDoc,
-  serverTimestamp
+  serverTimestamp,
+  setDoc,
+  query,
+  where              // ✅ 추가
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyAZHqkGXdH4XxL-0jprA2DB7YO4XhTdNmQ",
@@ -423,7 +428,7 @@ window.likeChat = async function(id, btn) {
     countSpan.textContent = currentLikes - 1;
   } else {
     await updateDoc(ref, { likes: currentLikes + 1 });
-    localStorage.setItem(key, "true");
+
     btn.classList.add("liked");
     btn.innerHTML = "💙";
     countSpan.textContent = currentLikes + 1;
@@ -508,7 +513,7 @@ async function countVisitor() {
 
 
 
-  localStorage.setItem('visited_' + todayKey, 'true');
+ localStorage.setItem('visited_' + pageKey, 'true');
 }
 
 async function getVisitorCount(todayKey) {
@@ -529,24 +534,30 @@ function displayVisitorCount(count) {
   }
 }
 
+
 async function countTodayUploadRequests() {
   const todayKey = getKSTDateKey();
   const start = new Date(`${todayKey}T00:00:00+09:00`);
   const end = new Date(`${todayKey}T23:59:59+09:00`);
-  const q = query(collection(db, "visitor_requests"));
-  const snapshot = await getDocs(q);
 
-  let count = 0;
-  snapshot.forEach(docSnap => {
-    const ts = docSnap.data().timestamp?.toDate();
-    if (ts && ts >= start && ts <= end) count++;
-  });
+  // chat 컬렉션에서 오늘 글만 조회
+  const q = query(
+    collection(db, "chat"),
+    where("timestamp", ">=", start),
+    where("timestamp", "<=", end)
+  );
+
+  const snapshot = await getDocs(q);
+  const count = snapshot.size;
 
   const countDiv = document.getElementById("upload-count");
   if (countDiv) {
-    countDiv.textContent = `오늘 답변 수: ${count.toLocaleString()}건`;
+    countDiv.textContent = `오늘 채팅 수: ${count.toLocaleString()}건`;
   }
 }
+
+
+
 countVisitor();
 countTodayUploadRequests();
 
