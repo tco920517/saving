@@ -191,6 +191,12 @@
 
 <button id="adminBtn">🔒 달주 전용</button>
 
+<div id="status-bar" style="display:flex; justify-content:center; gap:20px; font-size:13px; color:#555; margin-top:12px;">
+  <div id="upload-count">오늘 업로드 요청을 불러오는 중...</div>
+  <div id="visit-count">방문자 수를 불러오는 중...</div>
+</div>
+
+
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -459,6 +465,103 @@ editInput.addEventListener("input", function () {
   this.style.height = "auto";
   this.style.height = this.scrollHeight + "px";
 });
+
+
+
+
+
+
+
+
+function getKSTDateKey() {
+  const now = new Date();
+  const kstOffset = 9 * 60 * 60 * 1000;
+  const kstNow = new Date(now.getTime() + kstOffset);
+  return kstNow.toISOString().split('T')[0];
+}
+
+async function countVisitor() {
+  const dateKey = getKSTDateKey();
+  const pageKey = dateKey + "_event"; // ✅ 페이지 구분 추가
+  const visited = localStorage.getItem('visited_' + pageKey);
+  if (visited) {
+    getVisitorCount(pageKey);
+    return;
+  }
+
+  const counterRef = doc(db, "visit_count", pageKey);  // ✅ 문서 ID에 _event
+  const snap = await getDoc(counterRef);
+  if (snap.exists()) {
+    const current = snap.data().total || 0;
+    await setDoc(counterRef, { total: current + 1 });
+    displayVisitorCount(current + 1);
+  } else {
+    await setDoc(counterRef, { total: 1 });
+    displayVisitorCount(1);
+  }
+
+  localStorage.setItem('visited_' + pageKey, 'true');
+}
+
+async function getVisitorCount(pageKey) {
+  const counterRef = doc(db, "visit_count", pageKey);
+  const snap = await getDoc(counterRef);
+  if (snap.exists()) {
+    const current = snap.data().total || 0;
+    displayVisitorCount(current);
+  } else {
+    displayVisitorCount(0);
+  }
+}
+
+
+
+
+
+  localStorage.setItem('visited_' + todayKey, 'true');
+}
+
+async function getVisitorCount(todayKey) {
+  const counterRef = doc(db, "visit_count", todayKey);
+  const snap = await getDoc(counterRef);
+  if (snap.exists()) {
+    const current = snap.data().total || 0;
+    displayVisitorCount(current);
+  } else {
+    displayVisitorCount(0);
+  }
+}
+
+function displayVisitorCount(count) {
+  const visitDiv = document.getElementById("visit-count");
+  if (visitDiv) {
+    visitDiv.textContent = `오늘 방문자 수: ${count.toLocaleString()}명`;
+  }
+}
+
+async function countTodayUploadRequests() {
+  const todayKey = getKSTDateKey();
+  const start = new Date(`${todayKey}T00:00:00+09:00`);
+  const end = new Date(`${todayKey}T23:59:59+09:00`);
+  const q = query(collection(db, "visitor_requests"));
+  const snapshot = await getDocs(q);
+
+  let count = 0;
+  snapshot.forEach(docSnap => {
+    const ts = docSnap.data().timestamp?.toDate();
+    if (ts && ts >= start && ts <= end) count++;
+  });
+
+  const countDiv = document.getElementById("upload-count");
+  if (countDiv) {
+    countDiv.textContent = `오늘 업로드 요청: ${count.toLocaleString()}건`;
+  }
+}
+countVisitor();
+countTodayUploadRequests();
+
+
+
 
 </script>
 </body>
