@@ -247,20 +247,10 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 
 import {
-  getFirestore,
-  collection,
-  getDocs,
-  addDoc,
-  deleteDoc,
-  doc,
-  getDoc,
-  updateDoc,
-  serverTimestamp,
-  setDoc,
-  query,
-  where              // ✅ 추가
+  getFirestore, collection, getDocs, addDoc, deleteDoc, doc, getDoc,
+  updateDoc, serverTimestamp, setDoc, query, where, increment
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-/* ===== 오늘의 주제 자동 변경 ===== */
+
 /* ===== 오늘의 주제 자동 변경 ===== */
 const TOPIC_LIST = [
   '아스팔트로 나왔던 나날 중, 마음을 가장 크게 흔든 순간이 있었나요?',
@@ -573,6 +563,8 @@ window.togglePin = async function(id, currentlyPinned) {
   loadChat();
 };
 
+
+
 window.likeChat = async function(id, btn) {
   const key = `liked_${id}`;
   const ref = doc(db, "chat", id);
@@ -583,22 +575,25 @@ window.likeChat = async function(id, btn) {
   let currentLikes = data.likes || 0;
 
   const liked = localStorage.getItem(key) === "true";
+  btn.disabled = true;
   if (liked) {
-    await updateDoc(ref, { likes: currentLikes - 1 });
-
-
+    await updateDoc(ref, { likes: increment(-1) });
     localStorage.setItem(key, "false");
     btn.classList.remove("liked");
-    btn.innerHTML = "♡";
+    btn.innerHTML = "🤍";
     countSpan.textContent = currentLikes - 1;
   } else {
-    await updateDoc(ref, { likes: currentLikes + 1 });
-
+    await updateDoc(ref, { likes: increment(1) });
+    localStorage.setItem(key, "true");
     btn.classList.add("liked");
     btn.innerHTML = "💙";
     countSpan.textContent = currentLikes + 1;
   }
+  btn.disabled = false;
 };
+
+
+
 window.editChat = function(id, currentText) {
   const editBox = document.getElementById("editInput");
   const editBtn = document.getElementById("editSubmitBtn");
