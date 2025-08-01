@@ -21,6 +21,30 @@
   max-height: 1.5em;   /* 첫 줄만 보이게 */
   overflow: hidden;
 }
+/* 상단 주제 박스 */
+.topic-bar {
+  position: sticky;     /* 스크롤해도 상단 고정 */
+  top: 0;
+  z-index: 10000;       /* 다른 요소보다 위 */
+  max-width: 500px;
+  margin: 0 auto;       /* 가운데 정렬 */
+  padding: 10px 14px;
+  background: #ffffff;
+  border: 2px solid #1e90ff;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  box-sizing: border-box;
+}
+
+.topic-text {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f3257;
+  line-height: 1.4;
+  text-align: center;
+  display: block;
+  word-break: keep-all;
+}
 
 .chat-text.expanded {
   max-height: none;
@@ -158,11 +182,12 @@
 
 .pinned-card {
   position: sticky;
-  top: 0;
-  z-index: 9999; /* 가장 위로 올리기 */
+  top: 68px;    /* 주제 박스 높이만큼 내려서 겹치지 않게 */
+  z-index: 9999;
   background-color: #fff8dc;
   border: 2px solid #ff8c00;
 }
+
 /* 반짝 효과 */
 @keyframes sparkle {
   0%   { opacity: 1; text-shadow: 0 0 5px #3399ff; }
@@ -198,11 +223,10 @@
 
 
 
-<div style="max-width: 500px; margin: 20px auto 0; padding: 0 10px; font-size: 17px; color: #000; text-align: center;">
-  <div id="daily-topic">
-    <span id="topic-text" class="sparkling-text">(불러오는 중…)</span>
-  </div>
-</div> <!-- ← 이 줄 추가로 div 닫기 -->
+<div class="topic-bar">
+  <span id="topic-text" class="topic-text sparkling-text">(불러오는 중…)</span>
+</div>
+
 
 
 
