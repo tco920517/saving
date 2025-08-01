@@ -40,11 +40,16 @@
     text-align: left;
     position: relative;
   }
+  .card-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 10px;
+    gap: 12px;
+  }
   .timestamp {
     font-size: 12px;
     color: #888;
-    text-align: right;
-    margin-top: 8px;
   }
   .input-container {
     max-width: 500px;
@@ -82,19 +87,61 @@
     cursor: pointer;
     font-size: 14px;
   }
+  .delete-button {
+    background-color: #999;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 13px;
+    cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+  .like-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+  }
+  .like-button.liked {
+    color: #007bff;
+  }
+  .like-count {
+    font-size: 14px;
+    color: #333;
+    margin-left: 4px;
+  }
 </style>
 </head>
 <body>
+
+
+<div style="max-width: 500px; margin: 20px auto 0; padding: 0 10px; font-size: 17px; font-weight: bold; color: #000000; text-align: center;">
+1. 다음 여성시대 <span style="color: red;">저격/부정적 언급 금지</span></br></br>
+2. 전생달글 언급 금지</br></br>
+3. 나눔받은 물품 상세 언급 금지</br>
+<small style="color: #888888;">ex. 나눔받은 음식 먹으며 버틸 수 있었다. ⭕</br>
+나눔받은 김밥 먹으며 버틸 수 있었다. ❌</small>
+</br></br>
+🧨공지 어긴 글은 무통보 삭제합니다.🧨
+</div>
 <div class="chat-container" id="chatBox"></div>
 
 <div class="input-container">
-  <input type="text" id="chatInput" placeholder="메시지를 입력하세요"/>
-  <button id="sendBtn">보내기</button>
+  <input type="text" id="chatInput" placeholder="등록 후 수정/삭제 불가. 공지 어긴 글은 달주가 무통보 삭제."/>
+  <button id="sendBtn">등록</button>
 </div>
 
-<button id="adminBtn">🔒 관리자 전용</button>
+<button id="adminBtn">🔒 달주 전용</button>
 
-<!-- ✅ Firebase 연동 및 관리자 기능 -->
+
+
+
+
+
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
@@ -105,6 +152,7 @@ import {
   deleteDoc,
   doc,
   getDoc,
+  updateDoc,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -125,9 +173,21 @@ document.getElementById("sendBtn").onclick = async () => {
   const text = input.value.trim();
   if (!text) return;
 
+  // 닉네임 자동 부여
+  const counterRef = doc(db, "meta", "nicknameCounter");
+  const counterSnap = await getDoc(counterRef);
+  let nickname = "익명 ?";
+  if (counterSnap.exists()) {
+    const count = counterSnap.data().count || 1;
+    nickname = `익명 ${count}`;
+    await updateDoc(counterRef, { count: count + 1 });  // 다음 번호로 증가
+  }
+
   await addDoc(collection(db, "chat"), {
     text,
-    timestamp: serverTimestamp()
+    timestamp: serverTimestamp(),
+    likes: 0,
+    nickname
   });
   input.value = "";
   loadChat();
@@ -139,12 +199,33 @@ async function loadChat() {
   const snapshot = await getDocs(collection(db, "chat"));
   snapshot.forEach(docSnap => {
     const data = docSnap.data();
+    const id = docSnap.id;
+    const key = `liked_${id}`;
+    const liked = localStorage.getItem(key) === "true";
+
     const div = document.createElement("div");
     div.className = "chat-card";
-    div.innerHTML = `
-      <div>${data.text}</div>
-      <div class="timestamp">${data.timestamp && data.timestamp.toDate ? new Date(data.timestamp.toDate()).toLocaleString("ko-KR") : ""}</div>
-      ${isAdmin ? `<button onclick="deleteChat('${docSnap.id}')">삭제</button>` : ""}
+
+
+
+div.innerHTML = `
+  ${isAdmin ? `<button class="delete-button" onclick="deleteChat('${id}')">삭제</button>` : ""}
+  <div><strong>${data.nickname || "익명"}</strong></div>
+  <div>${data.text}</div>
+  <div class="card-footer">
+        <button class="like-button ${liked ? "liked" : ""}" onclick="likeChat('${id}', this)">${liked ? "💙" : "♡"}</button>
+        <span class="like-count">${data.likes || 0}</span>
+        <div class="timestamp">${data.timestamp && data.timestamp.toDate ? (() => {
+  const date = new Date(data.timestamp.toDate());
+  return date.toLocaleString("ko-KR", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+})() : ""}</div>
+      </div>
     `;
     box.appendChild(div);
   });
@@ -156,6 +237,31 @@ window.deleteChat = async function(id) {
   if (!ok) return;
   await deleteDoc(doc(db, "chat", id));
   loadChat();
+};
+
+window.likeChat = async function(id, btn) {
+  const key = `liked_${id}`;
+  const ref = doc(db, "chat", id);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) return;
+  const data = snap.data();
+  const countSpan = btn.nextElementSibling;
+  let currentLikes = data.likes || 0;
+
+  const liked = localStorage.getItem(key) === "true";
+  if (liked) {
+    await updateDoc(ref, { likes: currentLikes - 1 });
+    localStorage.setItem(key, "false");
+    btn.classList.remove("liked");
+    btn.innerHTML = "♡";
+    countSpan.textContent = currentLikes - 1;
+  } else {
+    await updateDoc(ref, { likes: currentLikes + 1 });
+    localStorage.setItem(key, "true");
+    btn.classList.add("liked");
+    btn.innerHTML = "💙";
+    countSpan.textContent = currentLikes + 1;
+  }
 };
 
 document.getElementById("adminBtn").onclick = async () => {
@@ -175,5 +281,10 @@ document.getElementById("adminBtn").onclick = async () => {
 
 loadChat();
 </script>
+
+
+
+
+
 </body>
 </html>
