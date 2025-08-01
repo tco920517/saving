@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>이벤트 페이지</title>
+<title>여성시대 뉴스 시사 라이브 달글 - 이벤트 페이지</title>
 <style>
   body {
     font-family: "Malgun Gothic", sans-serif;
@@ -30,7 +31,6 @@
     padding: 16px;
     margin: 20px auto;
     border-radius: 12px;
-    background-color: #ffffff;
     border: 1px solid #ccc;
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     font-size: 14px;
@@ -117,7 +117,6 @@
 </head>
 <body>
 
-
 <div style="max-width: 500px; margin: 20px auto 0; padding: 0 10px; font-size: 17px; font-weight: bold; color: #000000; text-align: center;">
 1. 다음 여성시대 <span style="color: red;">저격/부정적 언급 금지</span></br></br>
 2. 전생달글 언급 금지</br></br>
@@ -135,12 +134,6 @@
 </div>
 
 <button id="adminBtn">🔒 달주 전용</button>
-
-
-
-
-
-
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -168,19 +161,20 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 let isAdmin = false;
 
+const pastelColors = ['#fff5f7', '#fffdea', '#f0fbff', '#f0fff4', '#f7f3ff', '#fffaf0', '#fef4fb'];
+
 document.getElementById("sendBtn").onclick = async () => {
   const input = document.getElementById("chatInput");
   const text = input.value.trim();
   if (!text) return;
 
-  // 닉네임 자동 부여
   const counterRef = doc(db, "meta", "nicknameCounter");
   const counterSnap = await getDoc(counterRef);
   let nickname = "익명 ?";
   if (counterSnap.exists()) {
     const count = counterSnap.data().count || 1;
     nickname = `익명 ${count}`;
-    await updateDoc(counterRef, { count: count + 1 });  // 다음 번호로 증가
+    await updateDoc(counterRef, { count: count + 1 });
   }
 
   await addDoc(collection(db, "chat"), {
@@ -197,34 +191,39 @@ async function loadChat() {
   const box = document.getElementById("chatBox");
   box.innerHTML = "";
   const snapshot = await getDocs(collection(db, "chat"));
+  let lastColorIndex = -1;
+
   snapshot.forEach(docSnap => {
     const data = docSnap.data();
     const id = docSnap.id;
     const key = `liked_${id}`;
     const liked = localStorage.getItem(key) === "true";
 
+    let colorIndex;
+    do {
+      colorIndex = Math.floor(Math.random() * pastelColors.length);
+    } while (colorIndex === lastColorIndex);
+    lastColorIndex = colorIndex;
+    const cardColor = pastelColors[colorIndex];
+
     const div = document.createElement("div");
     div.className = "chat-card";
+    div.style.backgroundColor = cardColor;
 
-
-
-div.innerHTML = `
-  ${isAdmin ? `<button class="delete-button" onclick="deleteChat('${id}')">삭제</button>` : ""}
-  <div><strong>${data.nickname || "익명"}</strong></div>
-  <div>${data.text}</div>
-  <div class="card-footer">
+    div.innerHTML = `
+      ${isAdmin ? `<button class="delete-button" onclick="deleteChat('${id}')">삭제</button>` : ""}
+      <div><strong>${data.nickname || "익명"}</strong></div>
+      <div>${data.text}</div>
+      <div class="card-footer">
         <button class="like-button ${liked ? "liked" : ""}" onclick="likeChat('${id}', this)">${liked ? "💙" : "♡"}</button>
         <span class="like-count">${data.likes || 0}</span>
         <div class="timestamp">${data.timestamp && data.timestamp.toDate ? (() => {
-  const date = new Date(data.timestamp.toDate());
-  return date.toLocaleString("ko-KR", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit"
-  });
-})() : ""}</div>
+          const date = new Date(data.timestamp.toDate());
+          return date.toLocaleString("ko-KR", {
+            year: "numeric", month: "2-digit", day: "2-digit",
+            hour: "2-digit", minute: "2-digit"
+          });
+        })() : ""}</div>
       </div>
     `;
     box.appendChild(div);
@@ -281,10 +280,5 @@ document.getElementById("adminBtn").onclick = async () => {
 
 loadChat();
 </script>
-
-
-
-
-
 </body>
 </html>
