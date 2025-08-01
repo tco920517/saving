@@ -14,9 +14,14 @@
     font-size: 14px;
   }
 .chat-text.preview {
-  max-height: 7.3em;
+  max-height: 3em;
   overflow: hidden;
 }
+.pinned-card .chat-text.preview {
+  max-height: 1.5em;   /* 첫 줄만 보이게 */
+  overflow: hidden;
+}
+
 .chat-text.expanded {
   max-height: none;
 }
@@ -179,31 +184,35 @@
   color: #007bff;
 }
 .question-chip {
-  display: inline-block;
+  display: block;            /* inline-block → block */
   margin: 6px 0 8px;
-  padding: 4px 8px;
+  padding: 6px 10px;         /* 세로 줄바꿈 감안해서 살짝 여유 */
   font-size: 12px;
   color: #333;
   background: #fff;
   border: 1px solid #ddd;
-  border-radius: 999px;
-  line-height: 1;
+  border-radius: 12px;       /* 원형 칩 말고 박스형으로 */
+  line-height: 1.4;          /* 줄바꿈 고려 */
   max-width: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;       /* nowrap 제거 */
+  word-wrap: break-word;     /* 긴 단어도 줄바꿈 */
+  overflow: visible;         /* 넘치지 않게 */
+  text-overflow: unset;      /* 말줄임표 제거 */
 }
+
 
 </style>
 </head>
 <body>
 
-<div style="max-width: 500px; margin: 20px auto 0; padding: 0 10px; font-size: 17px; font-weight: bold; color: #000000; text-align: center;">
 
 
-<div id="daily-topic" ...>
-  <span id="topic-text" class="sparkling-text">(불러오는 중…)</span>
-</div>
+<div style="max-width: 500px; margin: 20px auto 0; padding: 0 10px; font-size: 17px; color: #000; text-align: center;">
+  <div id="daily-topic">
+    <span id="topic-text" class="sparkling-text">(불러오는 중…)</span>
+  </div>
+</div> <!-- ← 이 줄 추가로 div 닫기 -->
+
 
 
 <div class="chat-container" id="chatBox"></div>
@@ -313,6 +322,10 @@ const TOPIC_LIST = [
   '뉴스 속에서 발견한 "작은 희망의 징후"는 무엇이었나요?',
   '오늘 주제에서 느낀 "우리는 반드시 해낼 수 있다"는 확신의 근거는 무엇이었나요?',
   '지금 돌아보면, "앞으로의 길에서 나 자신에게 해주고 싶은 격려의 말"은 무엇인가요?'
+  '당신의 탄핵푸드가 기억나나요? 무엇이었나요? (탄핵소추안 가결 시)'
+  '당신의 파면푸드가 기억나나요? 무엇이었나요? (헌재 파면 시)'
+  '첫 탄핵소추안 표결이 무산되었을 때, 어떤 기분이었나요?'
+  '구속 취소가 결정되었던 순간, 무엇을 하고 있었나요?'
 ];
 
 
@@ -516,11 +529,12 @@ if (!data.pinned) {
 
     div.appendChild(textDiv);
 
-    requestAnimationFrame(() => {
-      if (textDiv.scrollHeight > textDiv.clientHeight + 4) {
-        div.appendChild(toggle);
-      }
-    });
+requestAnimationFrame(() => {
+  if (textDiv.scrollHeight > textDiv.clientHeight + 4 || data.pinned === true) {
+    div.appendChild(toggle);
+  }
+});
+
 
     // 하단 좋아요/시간 표시
     const footer = document.createElement("div");
