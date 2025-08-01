@@ -192,7 +192,7 @@
 <button id="adminBtn">🔒 달주 전용</button>
 
 <div id="status-bar" style="display:flex; justify-content:center; gap:20px; font-size:13px; color:#555; margin-top:12px;">
-  <div id="upload-count">오늘 업로드 요청을 불러오는 중...</div>
+  <div id="upload-count">오늘의 답변 수를 불러오는 중...</div>
   <div id="visit-count">방문자 수를 불러오는 중...</div>
 </div>
 
@@ -415,6 +415,8 @@ window.likeChat = async function(id, btn) {
   const liked = localStorage.getItem(key) === "true";
   if (liked) {
     await updateDoc(ref, { likes: currentLikes - 1 });
+
+
     localStorage.setItem(key, "false");
     btn.classList.remove("liked");
     btn.innerHTML = "♡";
@@ -500,19 +502,7 @@ async function countVisitor() {
     displayVisitorCount(1);
   }
 
-  localStorage.setItem('visited_' + pageKey, 'true');
-}
 
-async function getVisitorCount(pageKey) {
-  const counterRef = doc(db, "visit_count", pageKey);
-  const snap = await getDoc(counterRef);
-  if (snap.exists()) {
-    const current = snap.data().total || 0;
-    displayVisitorCount(current);
-  } else {
-    displayVisitorCount(0);
-  }
-}
 
 
 
@@ -554,7 +544,7 @@ async function countTodayUploadRequests() {
 
   const countDiv = document.getElementById("upload-count");
   if (countDiv) {
-    countDiv.textContent = `오늘 업로드 요청: ${count.toLocaleString()}건`;
+    countDiv.textContent = `오늘 답변 수: ${count.toLocaleString()}건`;
   }
 }
 countVisitor();
