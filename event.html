@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>여성시대 뉴스 시사 라이브 달글 - 이벤트 페이지</title>
+<title>오늘의 메시지</title>
 <style>
   body {
     font-family: "Malgun Gothic", sans-serif;
@@ -13,11 +13,25 @@
     padding: 0;
     font-size: 14px;
   }
+.chat-text.preview {
+  max-height: 7.3em;
+  overflow: hidden;
+}
+.chat-text.expanded {
+  max-height: none;
+}
+.toggle-more {
+  text-align: right;
+  font-size: 12px;
+  color: gray;
+  cursor: pointer;
+  margin-top: 6px;
+}
   .chat-container {
     width: 100%;
     max-width: 500px;
     box-sizing: border-box;
-    height: 600px;
+    height: 90vh;
     overflow-y: auto;
     margin: 40px auto 10px;
     padding: 10px;
@@ -26,6 +40,20 @@
     padding-bottom: 20px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   }
+#editInput {
+  width: 100%;
+  display: none;
+  padding: 10px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-family: 'Malgun Gothic', sans-serif;
+  box-sizing: border-box;
+  resize: none;
+  overflow: hidden;
+  min-height: 38px;
+}
+
   .chat-card {
     max-width: 100%;
     padding: 16px;
@@ -40,13 +68,13 @@
     text-align: left;
     position: relative;
   }
-  .card-footer {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    margin-top: 10px;
-    gap: 12px;
-  }
+.card-footer {
+  display: flex;
+  justify-content: space-between; /* 양쪽 정렬로 바꿈 */
+  align-items: center;
+  margin-top: 10px;
+}
+
   .timestamp {
     font-size: 12px;
     color: #888;
@@ -58,13 +86,20 @@
     gap: 8px;
     padding: 0 10px;
   }
-  #chatInput {
-    flex: 1;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    font-size: 14px;
-  }
+#chatInput {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  font-family: 'Malgun Gothic', sans-serif;
+  resize: none;
+  overflow: hidden;
+  box-sizing: border-box;
+  min-height: 38px;
+  /* flex: 1; ← 이 줄 제거! */
+}
+
+
   #sendBtn {
     padding: 10px 16px;
     background-color: #007bff;
@@ -87,18 +122,17 @@
     cursor: pointer;
     font-size: 14px;
   }
-  .delete-button {
-    background-color: #999;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 4px 10px;
-    font-size: 13px;
-    cursor: pointer;
-    position: absolute;
-    top: 10px;
-    right: 10px;
-  }
+.admin-button {
+  background-color: #999;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 13px;
+  cursor: pointer;
+  margin-left: 6px;
+}
+
   .like-button {
     background: none;
     border: none;
@@ -113,29 +147,52 @@
     color: #333;
     margin-left: 4px;
   }
+
+.pinned-card {
+  position: sticky;
+  top: 0;
+  z-index: 9999; /* 가장 위로 올리기 */
+  background-color: #fff8dc;
+  border: 2px solid #ff8c00;
+}
+
 </style>
 </head>
 <body>
 
 <div style="max-width: 500px; margin: 20px auto 0; padding: 0 10px; font-size: 17px; font-weight: bold; color: #000000; text-align: center;">
-1. 다음 여성시대 <span style="color: red;">저격/부정적 언급 금지</span></br></br>
-2. 전생달글 언급 금지</br></br>
-3. 나눔받은 물품 상세 언급 금지</br>
-<small style="color: #888888;">ex. 나눔받은 음식 먹으며 버틸 수 있었다. ⭕</br>
-나눔받은 김밥 먹으며 버틸 수 있었다. ❌</small>
-</br></br>
-🧨공지 어긴 글은 무통보 삭제합니다.🧨
+
+<div style="text-align:center; font-size:20px; margin-bottom:10px;">
+  <strong class="sparkling-text">외부 공유 환영</strong>
 </div>
 <div class="chat-container" id="chatBox"></div>
 
-<div class="input-container">
-  <input type="text" id="chatInput" placeholder="등록 후 수정/삭제 불가. 공지 어긴 글은 달주가 무통보 삭제."/>
-  <button id="sendBtn">등록</button>
+
+<div class="input-container" style="flex-direction: column; gap: 10px;">
+  <!-- 등록용 -->
+  <textarea id="chatInput"
+    rows="1"
+    placeholder="등록 후 수정/삭제 불가. 공지 어긴 글은 달주가 무통보 삭제."
+    style="width: 100%; padding: 10px; font-size: 14px; border-radius: 8px; border: 1px solid #ccc; font-family: 'Malgun Gothic', sans-serif; box-sizing: border-box; resize: none; overflow: hidden;"></textarea>
+  <button id="sendBtn" style="align-self: flex-end;">등록</button>
+
+  <!-- ✏️ 수정용 입력창도 같이 넣기 -->
+  <textarea id="editInput"
+    placeholder="수정할 내용을 입력하세요"
+    rows="4"
+    style="width: 100%; display: none; padding: 10px; font-size: 14px; border-radius: 8px; border: 1px solid #ccc; font-family: 'Malgun Gothic', sans-serif; box-sizing: border-box; resize: none; overflow: hidden;"></textarea>
+  <button id="editSubmitBtn"
+    style="display: none; align-self: flex-end; padding: 10px 16px; background-color: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer;">수정 완료</button>
 </div>
+
+
+
+
 
 <button id="adminBtn">🔒 달주 전용</button>
 
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
   getFirestore,
@@ -160,6 +217,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 let isAdmin = false;
+let editingId = null;
 
 const pastelColors = ['#fff5f7', '#fffdea', '#f0fbff', '#f0fff4', '#f7f3ff', '#fffaf0', '#fef4fb'];
 
@@ -187,15 +245,41 @@ document.getElementById("sendBtn").onclick = async () => {
   loadChat();
 };
 
+document.getElementById("editSubmitBtn").onclick = async () => {
+  const text = document.getElementById("editInput").value.trim();
+  if (!text || !editingId) return;
+  const ref = doc(db, "chat", editingId);
+  await updateDoc(ref, { text });
+  editingId = null;
+  document.getElementById("editInput").style.display = "none";
+  document.getElementById("editSubmitBtn").style.display = "none";
+  document.getElementById("editInput").value = "";
+  loadChat();
+};
+
+
+
+
+
 async function loadChat() {
   const box = document.getElementById("chatBox");
   box.innerHTML = "";
   const snapshot = await getDocs(collection(db, "chat"));
   let lastColorIndex = -1;
 
+  const chats = [];
   snapshot.forEach(docSnap => {
-    const data = docSnap.data();
-    const id = docSnap.id;
+    chats.push({ id: docSnap.id, ...docSnap.data() });
+  });
+
+  chats.sort((a, b) => {
+    if (a.pinned && !b.pinned) return -1;
+    if (!a.pinned && b.pinned) return 1;
+    return (a.timestamp?.seconds || 0) - (b.timestamp?.seconds || 0);
+  });
+
+  for (const data of chats) {
+    const id = data.id;
     const key = `liked_${id}`;
     const liked = localStorage.getItem(key) === "true";
 
@@ -208,33 +292,108 @@ async function loadChat() {
 
     const div = document.createElement("div");
     div.className = "chat-card";
+    if (data.pinned === true) div.classList.add("pinned-card");
     div.style.backgroundColor = cardColor;
 
-    div.innerHTML = `
-      ${isAdmin ? `<button class="delete-button" onclick="deleteChat('${id}')">삭제</button>` : ""}
-      <div><strong>${data.nickname || "익명"}</strong></div>
-      <div>${data.text}</div>
-      <div class="card-footer">
-        <button class="like-button ${liked ? "liked" : ""}" onclick="likeChat('${id}', this)">${liked ? "💙" : "♡"}</button>
+    // 🔒 관리자 버튼 영역
+    if (isAdmin) {
+      const adminControls = document.createElement("div");
+      adminControls.style.display = "flex";
+      adminControls.style.justifyContent = "flex-end";
+      adminControls.style.gap = "6px";
+      adminControls.style.marginBottom = "8px";
+
+      const pinBtn = document.createElement("button");
+      pinBtn.className = "admin-button";
+      pinBtn.textContent = data.pinned ? "고정 해제" : "고정";
+      pinBtn.onclick = () => togglePin(id, !!data.pinned);
+
+      const editBtn = document.createElement("button");
+      editBtn.className = "admin-button";
+      editBtn.textContent = "수정";
+      editBtn.onclick = () => editChat(id, data.text.replace(/`/g, "\\`"));
+
+      const delBtn = document.createElement("button");
+      delBtn.className = "admin-button";
+      delBtn.textContent = "삭제";
+      delBtn.onclick = () => deleteChat(id);
+
+      adminControls.appendChild(pinBtn);
+      adminControls.appendChild(editBtn);
+      adminControls.appendChild(delBtn);
+      div.appendChild(adminControls);
+    }
+
+    // 닉네임/고정 마크
+    const header = document.createElement("div");
+    header.innerHTML = `<strong>${data.pinned ? "📌" : (data.nickname || "익명")}</strong>`;
+    div.appendChild(header);
+
+    // 본문 영역 (더보기/줄이기 포함)
+    const textDiv = document.createElement("div");
+    textDiv.className = "chat-text preview";
+    textDiv.innerHTML = (data.text || "")
+      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+      .replace(/~~(.+?)~~/g, '<span style="font-size: 12px; color: #888;">$1</span>')
+      .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>')
+      .replace(/\n/g, "<br>");
+
+    const toggle = document.createElement("div");
+    toggle.className = "toggle-more";
+    toggle.textContent = "더보기";
+    toggle.addEventListener("click", (e) => {
+      e.stopPropagation();
+      textDiv.classList.toggle("expanded");
+      textDiv.classList.toggle("preview");
+      toggle.textContent = textDiv.classList.contains("expanded") ? "줄이기" : "더보기";
+    });
+
+    div.appendChild(textDiv);
+
+    requestAnimationFrame(() => {
+      if (textDiv.scrollHeight > textDiv.clientHeight + 4) {
+        div.appendChild(toggle);
+      }
+    });
+
+    // 하단 좋아요/시간 표시
+    const footer = document.createElement("div");
+    footer.className = "card-footer";
+    footer.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 4px;">
+        <button class="like-button ${liked ? "liked" : ""}" onclick="likeChat('${id}', this)">
+          ${liked ? "💙" : "♡"}
+        </button>
         <span class="like-count">${data.likes || 0}</span>
-        <div class="timestamp">${data.timestamp && data.timestamp.toDate ? (() => {
-          const date = new Date(data.timestamp.toDate());
-          return date.toLocaleString("ko-KR", {
-            year: "numeric", month: "2-digit", day: "2-digit",
-            hour: "2-digit", minute: "2-digit"
-          });
-        })() : ""}</div>
       </div>
+      <div class="timestamp">${data.timestamp?.toDate ? new Date(data.timestamp.toDate()).toLocaleString("ko-KR", {
+        year: "numeric", month: "2-digit", day: "2-digit",
+        hour: "2-digit", minute: "2-digit"
+      }) : ""}</div>
     `;
+
+    div.appendChild(footer);
     box.appendChild(div);
-  });
+  }
+
   box.scrollTop = box.scrollHeight;
 }
+
+
+
+
+
+
 
 window.deleteChat = async function(id) {
   const ok = confirm("삭제할까요?");
   if (!ok) return;
   await deleteDoc(doc(db, "chat", id));
+  loadChat();
+};
+window.togglePin = async function(id, currentlyPinned) {
+  const ref = doc(db, "chat", id);
+  await updateDoc(ref, { pinned: !currentlyPinned });
   loadChat();
 };
 
@@ -262,6 +421,16 @@ window.likeChat = async function(id, btn) {
     countSpan.textContent = currentLikes + 1;
   }
 };
+window.editChat = function(id, currentText) {
+  const editBox = document.getElementById("editInput");
+  const editBtn = document.getElementById("editSubmitBtn");
+  editingId = id;
+  editBox.value = currentText;
+  editBox.style.display = "block";
+  editBtn.style.display = "inline-block";
+};
+
+
 
 document.getElementById("adminBtn").onclick = async () => {
   const pwd = prompt("비밀번호를 입력하세요");
@@ -279,6 +448,18 @@ document.getElementById("adminBtn").onclick = async () => {
 };
 
 loadChat();
+const chatInput = document.getElementById("chatInput");
+
+chatInput.addEventListener("input", function () {
+  this.style.height = "auto";
+  this.style.height = this.scrollHeight + "px";
+});
+const editInput = document.getElementById("editInput");
+editInput.addEventListener("input", function () {
+  this.style.height = "auto";
+  this.style.height = this.scrollHeight + "px";
+});
+
 </script>
 </body>
 </html>
