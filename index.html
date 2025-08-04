@@ -225,9 +225,18 @@
 <option value="💬채팅용 한 줄(랜덤 복사)">💬채팅용 한 줄(랜덤 복사)</option>
 
   </select>
-  <textarea id="newMessage" placeholder="내용" rows="3" style="width: 100%; height: 160px; box-sizing: border-box; overflow-y: auto;font-family: 'Malgun Gothic', sans-serif;"></textarea>
-  <br/>
-  <button onclick="addOrUpdateMessage()">내용 추가</button>
+<textarea id="newMessage" placeholder="내용" rows="3" style="width: 100%; height: 160px; box-sizing: border-box; overflow-y: auto;font-family: 'Malgun Gothic', sans-serif;"></textarea>
+
+<label style="display:block; margin-top:6px; font-size:13px;">
+  <input type="checkbox" id="secretCheckbox"> 비밀글
+</label>
+
+<br/>
+<button onclick="addOrUpdateMessage()">내용 추가</button>
+
+
+
+
 <hr style="margin: 20px 0; border: none; border-top: 1px solid #ccc;" />
 <div id="visitor-messages" style="margin-top: 20px;">
   <h4 style="text-align:left; font-size:16px;">📨 방문자 메시지</h4>
@@ -262,6 +271,20 @@ const db = getFirestore(app);
 let isAdmin = false;
 let editingId = null;
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 async function loadMessages() {
   const container = document.getElementById("chatBox");
 const previousScrollTop = container.scrollTop;
@@ -292,14 +315,35 @@ const previousScrollTop = container.scrollTop;
   snapshot.forEach(docSnap => {
     const data = docSnap.data();
     const id = docSnap.id;
+// 🔒 비밀글은 관리자만 보이게
+if (data.secret === true && !isAdmin) return;
+
+
     const msg = data.content;
     const prefix = data.prefix || "";
 const ts = data.timestamp ? data.timestamp.toDate() : new Date();
 const yearShort = String(ts.getFullYear()).slice(2); 
 const dateOnly = yearShort + '-' + String(ts.getMonth()+1).padStart(2, '0') + '-' + String(ts.getDate()).padStart(2, '0');
-    const bubble = document.createElement("div");
-    bubble.className = "chat-card";
-    const contentDiv = document.createElement("div");
+
+const bubble = document.createElement("div");
+bubble.className = "chat-card";
+
+// 비밀글이면 🔒 표시 추가
+if (data.secret === true) {
+  const lockIcon = document.createElement("div");
+  lockIcon.textContent = "🔒";
+  lockIcon.style.cssText = `
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 16px;
+  `;
+  bubble.appendChild(lockIcon);
+}
+
+const contentDiv = document.createElement("div");
+
+
     contentDiv.className = "chat-content preview";
     const inner = document.createElement("div");
     inner.className = "inner-text";
@@ -462,11 +506,18 @@ if (prefix === "💬채팅용 한 줄(랜덤 복사)") {
       btns.style.display = "block";
       const editBtn = document.createElement("button");
       editBtn.textContent = "수정";
-      editBtn.onclick = () => {
-        document.getElementById("newMessage").value = msg;
-        document.getElementById("prefix").value = prefix;
-        editingId = id;
-      };
+
+
+editBtn.onclick = () => {
+  document.getElementById("newMessage").value = msg;
+  document.getElementById("prefix").value = prefix;
+  const scb = document.getElementById("secretCheckbox");
+  if (scb) scb.checked = !!data.secret;  // 🔒 비밀글 상태 반영
+  editingId = id;
+};
+
+
+
 const delBtn = document.createElement("button");
 delBtn.textContent = "삭제";
 delBtn.onclick = async () => {
@@ -605,19 +656,30 @@ function renderKeywordGuide() {
 }
 
 
+
+
+
 async function addOrUpdateMessage() {
   const content = document.getElementById("newMessage").value.trim();
   const prefix = document.getElementById("prefix").value;
+  const secretCheckbox = document.getElementById("secretCheckbox");
+  const secret = secretCheckbox ? secretCheckbox.checked : false;
   if (!content) return;
+
   if (editingId) {
-    await updateDoc(doc(db, "message", editingId), { content, prefix });
+    await updateDoc(doc(db, "message", editingId), { content, prefix, secret });
     editingId = null;
   } else {
-    await addDoc(collection(db, "message"), { content, prefix, timestamp: serverTimestamp() });
+    await addDoc(collection(db, "message"), { content, prefix, secret, timestamp: serverTimestamp() });
   }
+
   document.getElementById("newMessage").value = "";
+  if (secretCheckbox) secretCheckbox.checked = false;
   loadMessages();
-}async function showPasswordPrompt() {
+}
+
+async function showPasswordPrompt() {
+
   const pwd = prompt("비밀번호를 입력하세요");
   if (!pwd) return;
   try {
