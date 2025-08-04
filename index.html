@@ -154,6 +154,19 @@
   color: #007bff;
 }
 </style>
+
+<script>
+function escapeHTML(s){
+  return String(s).replace(/[&<>"']/g, function(m){
+    return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m]);
+  });
+}
+function linkify(text){
+  const escaped = escapeHTML(text || "");
+  return escaped.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+}
+</script>
+
 </head>
 <body>
 <div id="toast">📋 복사</div>
@@ -764,10 +777,12 @@ window.setSearchText = setSearchText;
 window.addOrUpdateMessage = addOrUpdateMessage;
 window.showPasswordPrompt = showPasswordPrompt;
 function getKSTDateKey() {
-  const now = new Date();
-  const kstOffset = 9 * 60 * 60 * 1000; // 한국은 UTC+9
-  const kstNow = new Date(now.getTime() + kstOffset);
-  return kstNow.toISOString().split('T')[0];
+  const fmt = new Intl.DateTimeFormat('ko-KR', { timeZone: 'Asia/Seoul', year:'numeric', month:'2-digit', day:'2-digit' });
+  const parts = fmt.formatToParts(new Date());
+  const y = parts.find(p=>p.type==='year').value;
+  const m = parts.find(p=>p.type==='month').value;
+  const d = parts.find(p=>p.type==='day').value;
+  return `${y}-${m}-${d}`;
 }
 
 window.filterMessages = filterMessages;
@@ -820,7 +835,7 @@ function displayVisitorCount(count) {
   if (visitDiv) {
     visitDiv.textContent = `오늘 방문자 수: ${count.toLocaleString()}명`;
   }
-}countVisitor();
+}
 window.submitVisitorMessage = async function() {
   const content = document.getElementById("visitorMessage").value.trim();
   if (!content) return alert("메시지를 입력해주세요.");
