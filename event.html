@@ -18,7 +18,8 @@
   overflow: hidden;
 }
 .pinned-card .chat-text.preview {
-  max-height: 1.5em;   /* 첫 줄만 보이게 */
+  max-height: 1.2em;   /* 더 낮게 */
+  line-height: 1.2;
   overflow: hidden;
 }
 /* 상단 주제 박스 */
@@ -179,11 +180,14 @@
     color: #333;
     margin-left: 4px;
   }
-
+.pinned-card .card-footer {
+  display: none;
+}
 .pinned-card {
   position: sticky;
   top: 1px;    /* 주제 박스 높이만큼 내려서 겹치지 않게 */
   z-index: 9999;
+padding: 8px; 
   background-color: #fff8dc;
   border: 2px solid #ff8c00;
 }
@@ -573,23 +577,27 @@ requestAnimationFrame(() => {
 });
 
 
-    // 하단 좋아요/시간 표시
-    const footer = document.createElement("div");
-    footer.className = "card-footer";
-    footer.innerHTML = `
-      <div style="display: flex; align-items: center; gap: 4px;">
-        <button class="like-button ${liked ? "liked" : ""}" onclick="likeChat('${id}', this)">
-          ${liked ? "💙" : "🤍"}
-        </button>
-        <span class="like-count">${data.likes || 0}</span>
-      </div>
-      <div class="timestamp">${data.timestamp?.toDate ? new Date(data.timestamp.toDate()).toLocaleString("ko-KR", {
-        year: "numeric", month: "2-digit", day: "2-digit",
-        hour: "2-digit", minute: "2-digit"
-      }) : ""}</div>
-    `;
 
-    div.appendChild(footer);
+    // 하단 좋아요/시간 표시
+if (!data.pinned) {
+  const footer = document.createElement("div");
+  footer.className = "card-footer";
+  footer.innerHTML = `
+    <div style="display: flex; align-items: center; gap: 4px;">
+      <button class="like-button ${liked ? "liked" : ""}" onclick="likeChat('${id}', this)">
+        ${liked ? "💙" : "🤍"}
+      </button>
+      <span class="like-count">${data.likes || 0}</span>
+    </div>
+    <div class="timestamp">${data.timestamp?.toDate ? new Date(data.timestamp.toDate()).toLocaleString("ko-KR", {
+      year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit"
+    }) : ""}</div>
+  `;
+  div.appendChild(footer);}
+
+
+
     box.appendChild(div);
   }
 
