@@ -111,7 +111,7 @@
     z-index: 1000;
   }
   .chat-content.preview .inner-text {
-    max-height: 7.3em;
+    max-height: 6em;
     overflow: hidden;
   }
   .chat-content.expanded .inner-text {
@@ -157,20 +157,20 @@
 </head>
 <body>
 <div id="toast">📋 복사</div>
-<div class="page-title">
-<div class="main-title">민주주의를 위한 자료 모음 💙</div>
-<br/>
- <div style="font-size: 14px; color: 	#000000	; font-weight: bold;">참고용 소제목 <small>(클릭하면 입력됨)</small></div>
-<div style="font-size: 12px; font-weight: bold;">
-  <span style="color: #28a745; margin-right: 10px; cursor: pointer;" onclick="setSearchText('[정책]')">[정책]</span>
-  <span style="color: #6f42c1; margin-right: 10px; cursor: pointer;" onclick="setSearchText('[정보]')">[정보]</span>
-  <span style="color: #6f42c1; margin-right: 10px; cursor: pointer;" onclick="setSearchText('[이재명]')">[이재명]</span>
-  <span style="color: #dc3545; margin-right: 10px; cursor: pointer;" onclick="setSearchText('[인사 관련]')">[인사 관련]</span>
-  <span style="color: #4B2E2E; margin-right: 10px; cursor: pointer;" onclick="setSearchText('[방송]')">[방송]</span>
+<div style="text-align: center;">
+  <div style="font-size: 14px; color: #000000; font-weight: bold;">
+</br>
+    참고용 소제목 <small>(클릭하면 입력됨)</small>
+  </div>
+  <div style="font-size: 12px; font-weight: bold;">
+    <span style="color: #28a745; margin-right: 10px; cursor: pointer;" onclick="setSearchText('[정책]')">[정책]</span>
+    <span style="color: #6f42c1; margin-right: 10px; cursor: pointer;" onclick="setSearchText('[정보]')">[정보]</span>
+    <span style="color: #6f42c1; margin-right: 10px; cursor: pointer;" onclick="setSearchText('[이재명]')">[이재명]</span>
+    <span style="color: #dc3545; margin-right: 10px; cursor: pointer;" onclick="setSearchText('[인사 관련]')">[인사 관련]</span>
+    <span style="color: #4B2E2E; margin-right: 10px; cursor: pointer;" onclick="setSearchText('[방송]')">[방송]</span>
+  </div>
 </div>
- <div style="font-size: 14px; color: 	#808080	; font-weight: bold;"><small>말머리 선택후 소제목 클릭하면 검색에 용이합니다.</small></div>
-
-<br/>
+</br>
 <div class="chat-container" id="chatBox"></div>
 <div class="search-bar" style="display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
   <select id="prefixFilter" onchange="filterMessages()" 
