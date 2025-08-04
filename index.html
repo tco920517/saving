@@ -48,7 +48,6 @@
   padding: 16px;
   margin: 5px auto;
   border-radius: 12px;
-  background-color: #ffffff;
   border: 1px solid #ccc;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   font-size: 14px;
@@ -264,21 +263,20 @@ const db = getFirestore(app);
 let isAdmin = false;
 let editingId = null;
 
-
-
-
-
-
-
-
-
-
-
-
+const pastelColors = [
+  '#fffefe', // 거의 흰색 핑크기
+  '#fffef9', // 크림기 있는 흰색
+  '#fafdff', // 매우 흐린 하늘색
+  '#f9fffc', // 연한 민트빛 흰색
+  '#fefbff', // 흐린 라벤더 흰색
+  '#fffcf9', // 아이보리 느낌의 흰색
+  '#fefeff'  // 거의 퓨어 화이트
+];
 
 
 
 async function loadMessages() {
+  let lastColorIndex = -1;
   const container = document.getElementById("chatBox");
 const previousScrollTop = container.scrollTop;
   container.innerHTML = "";
@@ -320,6 +318,13 @@ const dateOnly = yearShort + '-' + String(ts.getMonth()+1).padStart(2, '0') + '-
 
 const bubble = document.createElement("div");
 bubble.className = "chat-card";
+let colorIndex;
+do {
+  colorIndex = Math.floor(Math.random() * pastelColors.length);
+} while (colorIndex === lastColorIndex);
+lastColorIndex = colorIndex;
+
+bubble.style.backgroundColor = pastelColors[colorIndex];
 
 // 비밀글이면 🔒 표시 추가
 if (data.secret === true) {
