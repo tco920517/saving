@@ -9,7 +9,7 @@
   body {
     font-family: "Malgun Gothic", sans-serif;
     background-color: #f2f5f8;
-    margin: 5;
+    margin: 5px;
     padding: 0;
     font-size: 14px;
   }
@@ -36,6 +36,11 @@
   box-shadow: 0 4px 10px rgba(0,0,0,0.08);
   box-sizing: border-box;
 }
+.pinned-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 6px;
+}
 
 .topic-text {
   font-size: 16px;
@@ -50,15 +55,15 @@
 .chat-text.expanded {
   max-height: none;
 }
-
-
 .toggle-more {
-  text-align: right;
   font-size: 12px;
   color: gray;
   cursor: pointer;
-  margin-top: 6px;
+  margin: 0;
+  display: inline-block;
+  font-weight: bold; /* ← 이 줄 추가 */
 }
+
 .chat-container {
   width: 100%;
   max-width: 500px;
@@ -270,11 +275,8 @@ padding: 8px;
   <div id="visit-count">방문자 수를 불러오는 중...</div>
 </div>
 
-
 <script type="module">
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-
 import {
   getFirestore, collection, getDocs, addDoc, deleteDoc, doc, getDoc,
   updateDoc, serverTimestamp, setDoc, query, where, increment
@@ -369,14 +371,11 @@ const TOPIC_LIST = [
   '힘들었지만, 그래도 "이건 내가 진짜 자랑스러웠다" 싶었던 기억이 있었나요?'
 ];
 
-
-
 // 방문 중 고정 랜덤 토픽 선택
 function getSessionTopic() {
   const key = "session_topic";
   const saved = sessionStorage.getItem(key);
   if (saved) return saved;
-  
   const i = Math.floor(Math.random() * TOPIC_LIST.length);
   const newTopic = TOPIC_LIST[i];
   sessionStorage.setItem(key, newTopic);
@@ -389,9 +388,7 @@ function renderTodayTopic() {
   if (!el) return;
   el.textContent = getSessionTopic();
 }
-
 renderTodayTopic();
-
 
 const firebaseConfig = {
   apiKey: "AIzaSyAZHqkGXdH4XxL-0jprA2DB7YO4XhTdNmQ",
@@ -408,16 +405,26 @@ let editingId = null;
 
 const pastelColors = ['#fff5f7', '#fffdea', '#f0fbff', '#f0fff4', '#f7f3ff', '#fffaf0', '#fef4fb'];
 
+/* ========= 공통 유틸 ========= */
+function makeToggleFor(textDiv) {
+  const toggle = document.createElement("span");
+  toggle.className = "toggle-more";
+  toggle.textContent = "더보기";
+  toggle.addEventListener("click", (e) => {
+    e.stopPropagation();
+    textDiv.classList.toggle("expanded");
+    textDiv.classList.toggle("preview");
+    toggle.textContent = textDiv.classList.contains("expanded") ? "줄이기" : "더보기";
+  });
+  return toggle;
+}
 
-
-
-
+/* ========= 전송/수정 ========= */
 document.getElementById("sendBtn").onclick = async () => {
   const input = document.getElementById("chatInput");
   const text = input.value.trim();
   if (!text) return;
 
-  // ▼ 현재 화면에 보이는 상단 질문 텍스트
   const topicText = (document.getElementById("topic-text")?.textContent || "").trim();
 
   const counterRef = doc(db, "meta", "nicknameCounter");
@@ -431,7 +438,7 @@ document.getElementById("sendBtn").onclick = async () => {
 
   await addDoc(collection(db, "chat"), {
     text,
-    question: topicText,  // ← 질문 함께 저장
+    question: topicText,
     timestamp: serverTimestamp(),
     likes: 0,
     nickname
@@ -440,9 +447,6 @@ document.getElementById("sendBtn").onclick = async () => {
   input.value = "";
   loadChat();
 };
-
-
-
 
 document.getElementById("editSubmitBtn").onclick = async () => {
   const text = document.getElementById("editInput").value.trim();
@@ -456,10 +460,7 @@ document.getElementById("editSubmitBtn").onclick = async () => {
   loadChat();
 };
 
-
-
-
-
+/* ========= 채팅 로드 (단일 정의) ========= */
 async function loadChat() {
   const box = document.getElementById("chatBox");
   box.innerHTML = "";
@@ -471,6 +472,7 @@ async function loadChat() {
     chats.push({ id: docSnap.id, ...docSnap.data() });
   });
 
+  // 고정글 먼저
   chats.sort((a, b) => {
     if (a.pinned && !b.pinned) return -1;
     if (!a.pinned && b.pinned) return 1;
@@ -482,19 +484,19 @@ async function loadChat() {
     const key = `liked_${id}`;
     const liked = localStorage.getItem(key) === "true";
 
+    // 카드 배경색 (연속 중복 방지)
     let colorIndex;
     do {
       colorIndex = Math.floor(Math.random() * pastelColors.length);
     } while (colorIndex === lastColorIndex);
     lastColorIndex = colorIndex;
-    const cardColor = pastelColors[colorIndex];
 
     const div = document.createElement("div");
     div.className = "chat-card";
-    if (data.pinned === true) div.classList.add("pinned-card");
-    div.style.backgroundColor = cardColor;
+    if (data.pinned) div.classList.add("pinned-card");
+    div.style.backgroundColor = pastelColors[colorIndex];
 
-    // 🔒 관리자 버튼 영역
+    // 관리자 버튼
     if (isAdmin) {
       const adminControls = document.createElement("div");
       adminControls.style.display = "flex";
@@ -523,97 +525,96 @@ async function loadChat() {
       div.appendChild(adminControls);
     }
 
-
-
-
-
-    // 닉네임/고정 마크
+    // 닉네임 / 고정
     const header = document.createElement("div");
     header.innerHTML = `<strong>${data.pinned ? "📌" : (data.nickname || "익명")}</strong>`;
     div.appendChild(header);
-// ▼ 질문 배지
 
+    // 질문 배지 (고정글 제외)
+    if (!data.pinned) {
+      const q = document.createElement("div");
+      q.className = "question-chip";
+      const qText = (data.question && String(data.question).trim()) || "질문 미기록";
+      q.textContent = `Q. ${qText}`;
+      div.appendChild(q);
+    }
 
-// ▼ 질문 배지 (고정글에는 표시 안 함)
-if (!data.pinned) {
-  const q = document.createElement("div");
-  q.className = "question-chip";
-  const qText = (data.question && String(data.question).trim()) || "질문 미기록";
-  q.textContent = `Q. ${qText}`;
-  div.appendChild(q);
-}
-
-
-
-
-    // 본문 영역 (더보기/줄이기 포함)
+    // 본문
     const textDiv = document.createElement("div");
-
-
-
-
     textDiv.className = "chat-text preview";
     textDiv.innerHTML = (data.text || "")
       .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
       .replace(/~~(.+?)~~/g, '<span style="font-size: 12px; color: #888;">$1</span>')
       .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>')
       .replace(/\n/g, "<br>");
-
-    const toggle = document.createElement("div");
-    toggle.className = "toggle-more";
-    toggle.textContent = "더보기";
-    toggle.addEventListener("click", (e) => {
-      e.stopPropagation();
-      textDiv.classList.toggle("expanded");
-      textDiv.classList.toggle("preview");
-      toggle.textContent = textDiv.classList.contains("expanded") ? "줄이기" : "더보기";
-    });
-
     div.appendChild(textDiv);
 
-requestAnimationFrame(() => {
-  if (textDiv.scrollHeight > textDiv.clientHeight + 4 || data.pinned === true) {
-    div.appendChild(toggle);
-  }
-});
+    /* ===== 고정글: 우측 하단 더보기 ===== */
+    if (data.pinned) {
+      requestAnimationFrame(() => {
+        if (textDiv.scrollHeight > textDiv.clientHeight + 4) {
+          const toggle = makeToggleFor(textDiv);
+          const pinnedFooter = document.createElement("div");
+          pinnedFooter.className = "pinned-footer";
+          pinnedFooter.appendChild(toggle);
+          div.appendChild(pinnedFooter);
+        }
+      });
+    }
 
+    /* ===== 일반 글: footer 오른쪽에 더보기 ===== */
+    if (!data.pinned) {
+      const footer = document.createElement("div");
+      footer.className = "card-footer";
 
+      const left = document.createElement("div");
+      left.style.display = "flex";
+      left.style.alignItems = "center";
+      left.style.gap = "4px";
+      left.innerHTML = `
+        <button class="like-button ${liked ? "liked" : ""}" onclick="likeChat('${id}', this)">
+          ${liked ? "💙" : "🤍"}
+        </button>
+        <span class="like-count">${data.likes || 0}</span>
+      `;
 
-    // 하단 좋아요/시간 표시
-if (!data.pinned) {
-  const footer = document.createElement("div");
-  footer.className = "card-footer";
-  footer.innerHTML = `
-    <div style="display: flex; align-items: center; gap: 4px;">
-      <button class="like-button ${liked ? "liked" : ""}" onclick="likeChat('${id}', this)">
-        ${liked ? "💙" : "🤍"}
-      </button>
-      <span class="like-count">${data.likes || 0}</span>
-    </div>
-    <div class="timestamp">${data.timestamp?.toDate ? new Date(data.timestamp.toDate()).toLocaleString("ko-KR", {
-      year: "numeric", month: "2-digit", day: "2-digit",
-      hour: "2-digit", minute: "2-digit"
-    }) : ""}</div>
-  `;
-  div.appendChild(footer);}
+      const right = document.createElement("div");
+      right.style.display = "flex";
+      right.style.alignItems = "center";
+      right.style.gap = "8px";
 
+      const timestamp = document.createElement("span");
+      timestamp.className = "timestamp";
+      timestamp.textContent = data.timestamp?.toDate
+        ? new Date(data.timestamp.toDate()).toLocaleString("ko-KR", {
+            year: "numeric", month: "2-digit", day: "2-digit",
+            hour: "2-digit", minute: "2-digit"
+          })
+        : "";
+      right.appendChild(timestamp);
 
+      // 더보기는 footer가 DOM에 들어간 뒤 높이를 계산해야 하므로 rAF에서 추가
+      requestAnimationFrame(() => {
+        if (textDiv.scrollHeight > textDiv.clientHeight + 4) {
+          const toggle = makeToggleFor(textDiv);
+          right.appendChild(toggle);
+        }
+      });
 
-    box.appendChild(div);
+      footer.appendChild(left);
+      footer.appendChild(right);
+      div.appendChild(footer);
+    }
+
+    document.getElementById("chatBox").appendChild(div);
   }
 
   box.scrollTop = box.scrollHeight;
 }
 
-
-
-
-
-
-
+/* ========= 전역 함수 ========= */
 window.deleteChat = async function(id) {
-  const ok = confirm("삭제할까요?");
-  if (!ok) return;
+  if (!confirm("삭제할까요?")) return;
   await deleteDoc(doc(db, "chat", id));
   loadChat();
 };
@@ -622,9 +623,6 @@ window.togglePin = async function(id, currentlyPinned) {
   await updateDoc(ref, { pinned: !currentlyPinned });
   loadChat();
 };
-
-
-
 window.likeChat = async function(id, btn) {
   const key = `liked_${id}`;
   const ref = doc(db, "chat", id);
@@ -632,7 +630,7 @@ window.likeChat = async function(id, btn) {
   if (!snap.exists()) return;
   const data = snap.data();
   const countSpan = btn.nextElementSibling;
-  let currentLikes = data.likes || 0;
+  const currentLikes = data.likes || 0;
 
   const liked = localStorage.getItem(key) === "true";
   btn.disabled = true;
@@ -651,9 +649,6 @@ window.likeChat = async function(id, btn) {
   }
   btn.disabled = false;
 };
-
-
-
 window.editChat = function(id, currentText) {
   const editBox = document.getElementById("editInput");
   const editBtn = document.getElementById("editSubmitBtn");
@@ -663,11 +658,10 @@ window.editChat = function(id, currentText) {
   editBtn.style.display = "inline-block";
 };
 
-
+/* ========= 기타 UI ========= */
 document.getElementById("infoBtn").onclick = () => {
   window.open("http://www.yssisa.store/index", "_blank", "noopener");
 };
-
 document.getElementById("adminBtn").onclick = async () => {
   const pwd = prompt("비밀번호를 입력하세요");
   if (!pwd) return;
@@ -684,8 +678,9 @@ document.getElementById("adminBtn").onclick = async () => {
 };
 
 loadChat();
-const chatInput = document.getElementById("chatInput");
 
+/* ========= 자동 높이 조절 ========= */
+const chatInput = document.getElementById("chatInput");
 chatInput.addEventListener("input", function () {
   this.style.height = "auto";
   this.style.height = this.scrollHeight + "px";
@@ -696,30 +691,22 @@ editInput.addEventListener("input", function () {
   this.style.height = this.scrollHeight + "px";
 });
 
-
-
-
-
-
-
-
+/* ========= 방문자/업로드 카운트 ========= */
 function getKSTDateKey() {
   const now = new Date();
   const kstOffset = 9 * 60 * 60 * 1000;
   const kstNow = new Date(now.getTime() + kstOffset);
   return kstNow.toISOString().split('T')[0];
 }
-
 async function countVisitor() {
   const dateKey = getKSTDateKey();
-  const pageKey = dateKey + "_event"; // ✅ 페이지 구분 추가
+  const pageKey = dateKey + "_event";
   const visited = localStorage.getItem('visited_' + pageKey);
   if (visited) {
     getVisitorCount(pageKey);
     return;
   }
-
-  const counterRef = doc(db, "visit_count", pageKey);  // ✅ 문서 ID에 _event
+  const counterRef = doc(db, "visit_count", pageKey);
   const snap = await getDoc(counterRef);
   if (snap.exists()) {
     const current = snap.data().total || 0;
@@ -729,64 +716,34 @@ async function countVisitor() {
     await setDoc(counterRef, { total: 1 });
     displayVisitorCount(1);
   }
-
-
-
-
-
-
-
- localStorage.setItem('visited_' + pageKey, 'true');
+  localStorage.setItem('visited_' + pageKey, 'true');
 }
-
 async function getVisitorCount(todayKey) {
   const counterRef = doc(db, "visit_count", todayKey);
   const snap = await getDoc(counterRef);
-  if (snap.exists()) {
-    const current = snap.data().total || 0;
-    displayVisitorCount(current);
-  } else {
-    displayVisitorCount(0);
-  }
+  displayVisitorCount(snap.exists() ? (snap.data().total || 0) : 0);
 }
-
 function displayVisitorCount(count) {
   const visitDiv = document.getElementById("visit-count");
-  if (visitDiv) {
-    visitDiv.textContent = `오늘 방문자 수: ${count.toLocaleString()}명`;
-  }
+  if (visitDiv) visitDiv.textContent = `오늘 방문자 수: ${count.toLocaleString()}명`;
 }
-
-
 async function countTodayUploadRequests() {
   const todayKey = getKSTDateKey();
   const start = new Date(`${todayKey}T00:00:00+09:00`);
   const end = new Date(`${todayKey}T23:59:59+09:00`);
-
-  // chat 컬렉션에서 오늘 글만 조회
-  const q = query(
+  const qy = query(
     collection(db, "chat"),
     where("timestamp", ">=", start),
     where("timestamp", "<=", end)
   );
-
-  const snapshot = await getDocs(q);
+  const snapshot = await getDocs(qy);
   const count = snapshot.size;
-
   const countDiv = document.getElementById("upload-count");
-  if (countDiv) {
-    countDiv.textContent = `오늘 채팅 수: ${count.toLocaleString()}건`;
-  }
+  if (countDiv) countDiv.textContent = `오늘 채팅 수: ${count.toLocaleString()}건`;
 }
-
-
-
 countVisitor();
 countTodayUploadRequests();
-
-
-
-
 </script>
+
 </body>
 </html>
