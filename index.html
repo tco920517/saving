@@ -184,8 +184,6 @@
     <option value="📣 팩트 체크">📣 팩트 체크</option>
     <option value="🔔 참고 자료">🔔 참고 자료</option>
     <option value="🍀 정책 반응">🍀 정책 반응</option>
-    <option value="💙 박찬대 당대표">💙 박찬대 당대표</option>
-    <option value="✨포지티브 댓글">✨포지티브 댓글</option>
 <option value="💬채팅용 한 줄(랜덤 복사)">💬채팅용 한 줄(랜덤 복사)</option>
 
   </select>
@@ -215,16 +213,15 @@
 <div id="input-area" style="display:none;">
 <div id="keyword-style-guide" style="margin-bottom: 12px; font-size: 13px; text-align: left;"></div>
 
-  <select id="prefix" style="width: 100%; max-width: 500px; margin-bottom: 8px; padding: 6px; font-size: 14px;">
-    <option value="">전체 보기</option>
-    <option value="📣 팩트 체크">📣 팩트 체크</option>
-    <option value="🔔 참고 자료">🔔 참고 자료</option>
-    <option value="🍀 정책 반응">🍀 정책 반응</option>
-    <option value="💙 박찬대 당대표">💙 박찬대 당대표</option>
-    <option value="✨포지티브 댓글">✨포지티브 댓글</option>
-<option value="💬채팅용 한 줄(랜덤 복사)">💬채팅용 한 줄(랜덤 복사)</option>
+<select id="prefix" style="width: 100%; max-width: 500px; margin-bottom: 8px; padding: 6px; font-size: 14px;">
+  <option value="">전체 보기</option>
+  <option value="📣 팩트 체크">📣 팩트 체크</option>
+  <option value="🔔 참고 자료">🔔 참고 자료</option>
+  <option value="🍀 정책 반응">🍀 정책 반응</option>
+  <option value="💬채팅용 한 줄(랜덤 복사)">💬채팅용 한 줄(랜덤 복사)</option>
+<option value="🔑 관리자 전용">🔑 관리자 전용</option>
+</select>
 
-  </select>
 <textarea id="newMessage" placeholder="내용" rows="3" style="width: 100%; height: 160px; box-sizing: border-box; overflow-y: auto;font-family: 'Malgun Gothic', sans-serif;"></textarea>
 
 <label style="display:block; margin-top:6px; font-size:13px;">
@@ -449,8 +446,6 @@ copyBtn.onclick = () => {
     raw.startsWith("📣") ||
     raw.startsWith("🔔") ||
     raw.startsWith("🍀") ||
-    raw.startsWith("💙") ||
-    raw.startsWith("✨") ||
     raw.startsWith("💬")
   ) {
     raw = raw.substring(raw.indexOf("\n") + 1).trim();
@@ -656,6 +651,19 @@ function renderKeywordGuide() {
 }
 
 
+// ✅ 말머리 선택 시 자동으로 secret 체크
+document.getElementById("prefix").addEventListener("change", function () {
+  const selected = this.value;
+  const secretCheckbox = document.getElementById("secretCheckbox");
+  if (!secretCheckbox) return;
+
+  if (selected === "🔑 관리자 전용") {
+    secretCheckbox.checked = true;
+    secretCheckbox.disabled = true; // 강제 적용되도록 비활성화
+  } else {
+    secretCheckbox.disabled = false;
+  }
+});
 
 
 
@@ -692,12 +700,22 @@ async function showPasswordPrompt() {
     const realPassword = docSnap.data().password;
     if (pwd === realPassword) {
       isAdmin = true;
-      document.getElementById("input-area").style.display = "block";
-renderKeywordGuide();
-      loadMessages();
-    } else {
-      alert("비밀번호가 틀렸습니다.");
-    }
+
+// ✅ 여기 추가
+  const prefixFilter = document.getElementById("prefixFilter");
+  if (prefixFilter && ![...prefixFilter.options].some(opt => opt.value === "🔑 관리자 전용")) {
+    const adminOpt = document.createElement("option");
+    adminOpt.value = "🔑 관리자 전용";
+    adminOpt.textContent = "🔑 관리자 전용";
+    prefixFilter.appendChild(adminOpt);
+  }
+
+  document.getElementById("input-area").style.display = "block";
+  renderKeywordGuide();
+  loadMessages();
+} else {
+  alert("비밀번호가 틀렸습니다.");
+}
   } catch (error) {
     console.error("비밀번호 확인 중 오류 발생:", error);
     alert("오류가 발생했습니다.");
