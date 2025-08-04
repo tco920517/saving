@@ -28,19 +28,20 @@
     font-size: 13px;
     font-weight: normal;
   }
-  .chat-container {
-    width: 100%;
-    max-width: 500px;
-    box-sizing: border-box;
-    height: 600px;
-    overflow-y: auto;
-    margin: 0 auto;
-    padding: 10px;
-    background-color: #e0f3ff;
-    border-radius: 15px;
-    padding-bottom: 20px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  }
+.chat-container {
+  width: 100%;
+  max-width: 500px;
+  height: 600px;          /* 기본 고정 높이 */
+  max-height: 75vh;       /* 작은 화면 대응 */
+  overflow-y: auto;
+  margin: 0 auto;
+  padding: 10px;
+  background-color: #e0f3ff;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
+}
+
   
 .chat-card {
   max-width: 100%;
