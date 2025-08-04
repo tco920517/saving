@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>오늘의 메시지</title>
+<title>마플방지 문답 페이지💙</title>
 <style>
   body {
     font-family: "Malgun Gothic", sans-serif;
@@ -59,7 +59,7 @@
   font-size: 12px;
   color: gray;
   cursor: pointer;
-  margin: 0;
+  margin: 0px;
   display: inline-block;
   font-weight: bold; /* ← 이 줄 추가 */
 }
@@ -151,7 +151,7 @@
   }
 #infoBtn, #adminBtn {
   display: block;
-  margin: 0;               /* ← auto 마진 제거 (가운데 벌어짐 원인) */
+  margin: 0px;               /* ← auto 마진 제거 (가운데 벌어짐 원인) */
   background-color: #333;
   color: white;
   border: none;
@@ -545,7 +545,7 @@ async function loadChat() {
     textDiv.innerHTML = (data.text || "")
       .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
       .replace(/~~(.+?)~~/g, '<span style="font-size: 12px; color: #888;">$1</span>')
-      .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>')
+      .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>')
       .replace(/\n/g, "<br>");
     div.appendChild(textDiv);
 
@@ -692,11 +692,17 @@ editInput.addEventListener("input", function () {
 });
 
 /* ========= 방문자/업로드 카운트 ========= */
+
 function getKSTDateKey() {
-  const now = new Date();
-  const kstOffset = 9 * 60 * 60 * 1000;
-  const kstNow = new Date(now.getTime() + kstOffset);
-  return kstNow.toISOString().split('T')[0];
+  const fmt = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Seoul',
+    year: 'numeric', month: '2-digit', day: '2-digit'
+  });
+  const parts = fmt.formatToParts(new Date());
+  const y = parts.find(p => p.type === 'year').value;
+  const m = parts.find(p => p.type === 'month').value;
+  const d = parts.find(p => p.type === 'day').value;
+  return `${y}-${m}-${d}`;
 }
 async function countVisitor() {
   const dateKey = getKSTDateKey();
@@ -743,6 +749,23 @@ async function countTodayUploadRequests() {
 }
 countVisitor();
 countTodayUploadRequests();
+</script>
+
+
+<script>
+// Safe HTML helpers
+function escapeHtml(s){
+  return (s ?? '').toString().replace(/[&<>"']/g, function(m){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];
+  });
+}
+function linkifyAndFormat(s){
+  return escapeHtml(s)
+    .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>')
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/~~(.+?)~~/g, '<span style="font-size:12px;color:#888;">$1</span>')
+    .replace(/\n/g, "<br>");
+}
 </script>
 
 </body>
