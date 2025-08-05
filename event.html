@@ -276,11 +276,14 @@ padding: 8px;
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";  // ← 추가
 import {
   getFirestore, collection, getDocs, addDoc, deleteDoc, doc, getDoc,
-  updateDoc, serverTimestamp, setDoc, query, where, increment
+  updateDoc, serverTimestamp, setDoc, query, where, increment,
+  orderBy, limit, startAfter
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+
 
 /* ===== 오늘의 주제 자동 변경 ===== */
 const TOPIC_LIST = [
@@ -303,8 +306,8 @@ const TOPIC_LIST = [
   '그때 배운 작은 생활 지혜(옷, 음식, 추위를 견디는 방법 등) 중에 지금도 쓰는 게 있으신가요? (전생 달글 언급 유의)',
   '길에서 만난 낯선 사람이 해준 말 중 아직도 기억나는 게 있으신가요?',
   '깃발/응원봉 등을 붙잡고 섰을 때, 가장 먼저 힘들었던 부분은 어디였나요?',
-  '나 혼자가 아니구나" 하고 느꼈던 순간은 언제였나요?',
-  '내가 살아 있다는 것 자체가 증거다"라고 느낀 순간은 언제였나요?',
+  '"나 혼자가 아니구나" 하고 느꼈던 순간은 언제였나요?',
+  '"내가 살아 있다는 것 자체가 역사의 증거다"라고 느낀 순간이 있었나요?',
   '누군가 건넨 따뜻한 음식이나 물 한 병이 유난히 고마웠던 날 기억나시나요?',
   '누군가의 눈물을 보면서 같이 마음이 무너졌던 순간이 있었나요?',
   '뉴스 속 장면 중, 함께해서 더 강해진 경험을 떠올리게 한 건 어떤 부분이었나요?',
@@ -332,16 +335,16 @@ const TOPIC_LIST = [
   '예전에 힘들었지만, 결국 우리가 이겨냈다고 느꼈던 순간은 어떤 건가요?',
   '예전의 절망적인 순간을 돌이켜보면, "그때 내가 버텨서 다행이다" 싶은 경험은 무엇인가요?',
   '우리가 함께 목소리를 낼 때, 세상이 바뀐 경험을 떠올리신 적 있으신가요?',
-  '우리는 이겼다"라고 느낀 작은 순간이 있었나요?',
+  '"우리가 이겼다"라고 느낀 작은 순간이 있었나요?',
   '윤석열 구속 취소 소식을 들었을 때 뭘 하고 있었나요?',
   '윤석열 구속 취소 이후, 다시 움직일 수 있었던 계기는 무엇이었나요?',
   '윤석열 사건의 여러 국면 중 지금 가장 선명히 남아 있는 순간은 무엇이었나요?',
   '윤석열 첫 구속 국면에서 함께했던 사람들과 나눈 대화 중 기억나는 건 무엇인가요? (전생 달글 언급 유의)',
   '윤석열 첫 구속 직전, 가장 또렷하게 남아 있는 장면은 무엇이었나요?',
   '윤석열 첫 구속 직전, 그 순간을 버티게 해준 힘은 무엇이었나요?',
-  '이 싸움은 내가 살아 있다는 증거다"라고 느꼈던 날은 언제였나요?',
-  '이건 꼭 기록해둬야겠다"라고 마음먹었던 순간이 있었나요?',
-  '이건 우리 세대가 반드시 해내야 한다"는 생각이 들었던 부분이 있을까요?',
+  '"이 싸움은 내가 살아 있다는 증거다"라고 느꼈던 날이 있었나요?',
+  '"이건 꼭 기록해둬야겠다"라고 마음먹었던 순간이 있었나요?',
+  '"이건 우리 세대가 반드시 해내야 한다"는 생각이 들었던 부분이 있을까요?',
   '이번 이슈를 보며 "나는 절대 포기하지 않겠다"는 생각을 굳히신 부분은 무엇이었나요?',
   '이번 주제에서 "앞으로의 나"에게 해주고 싶은 다짐은 어떤 건가요?',
   '정치·사회 현안 속에서 "작은 목소리라도 힘이 된다"는 걸 느끼신 경험이 있으신가요?',
@@ -355,7 +358,7 @@ const TOPIC_LIST = [
   '집회 끝나고 돌아오는 길, 하늘이나 바람이 다르게 느껴진 적 있으신가요?',
   '집회에서 만난 분들 중에 아직도 마음에 남는 얼굴이 있으신가요? (전생 달글 언급 유의)',
   '첫 탄핵소추안 표결이 무산되었을 때, 어떤 기분이었나요?',
-  '최근 보신 뉴스/영상 중에서 가장 "희망적"이라고 느끼신 장면은 무엇이었나요?',
+  '최근 보신 뉴스/영상 중에서 가장 희망적이라고 느끼신 장면은 무엇이었나요?',
   '최근 시사 이슈에서 가장 "긍정적인 변화의 씨앗"이라고 느끼신 건 무엇인가요?',
   '최근 정치·사회 변화 속에서 개인적으로 가장 힘이 되었던 기억은 무엇이었나요?',
   '추위 속에서도 "이 것 때문에 버틸 수 있다."는 느낌을 주었던 무언가가 있었나요?',
@@ -368,7 +371,8 @@ const TOPIC_LIST = [
   '헌재 판결을 기다리던 과정에서 나눈 대화 중 가장 기억나는 건 무엇이었나요?',
   '헌재 판결이 지연되던 시기에 가장 크게 느낀 점은 무엇이었나요?',
   '힘들 때 마음을 지탱해 준 노래나 구호가 있으셨나요? 있었다면 어느 가사/구호인가요?',
-  '힘들었지만, 그래도 "이건 내가 진짜 자랑스러웠다" 싶었던 기억이 있었나요?'
+  '힘들었지만, 그래도 "이건 내가 진짜 자랑스러웠다" 싶었던 기억이 있었나요?',
+  '부정적인 생각만 들고 마음이 너무 힘들 때마다, 다시 마음을 다잡게 만들었던 요소가 있나요?'
 ];
 
 // 방문 중 고정 랜덤 토픽 선택
@@ -404,6 +408,284 @@ let isAdmin = false;
 let editingId = null;
 
 const pastelColors = ['#fff5f7', '#fffdea', '#f0fbff', '#f0fff4', '#f7f3ff', '#fffaf0', '#fef4fb'];
+// ===== 페이지네이션 상태 =====
+const PAGE_SIZE = 7;        // 한 번에 7개
+let lastDocCursor = null;   // startAfter 커서
+let reachedEnd = false;     // 더 이상 로드할 데이터 없음
+let pinnedChats = [];       // 고정글(한 번만 로드)
+let normalChats = [];       // 일반글(오래된→최근 순으로 누적)
+
+// ========== 카드 생성 ==========
+function buildCard(data, isPinned) {
+  const id = data.id;
+  const key = `liked_${id}`;
+  const liked = localStorage.getItem(key) === "true";
+
+  const div = document.createElement("div");
+  div.className = "chat-card";
+  if (isPinned) div.classList.add("pinned-card");
+
+  // 관리자 버튼
+  if (isAdmin) {
+    const adminControls = document.createElement("div");
+    adminControls.style.display = "flex";
+    adminControls.style.justifyContent = "flex-end";
+    adminControls.style.gap = "6px";
+    adminControls.style.marginBottom = "8px";
+
+    const pinBtn = document.createElement("button");
+    pinBtn.className = "admin-button";
+    pinBtn.textContent = isPinned ? "고정 해제" : "고정";
+    pinBtn.onclick = () => togglePin(id, !!data.pinned);
+
+    const editBtn = document.createElement("button");
+    editBtn.className = "admin-button";
+    editBtn.textContent = "수정";
+    editBtn.onclick = () => editChat(id, (data.text || "").replace(/`/g, "\\`"));
+
+    const delBtn = document.createElement("button");
+    delBtn.className = "admin-button";
+    delBtn.textContent = "삭제";
+    delBtn.onclick = () => deleteChat(id);
+
+    adminControls.appendChild(pinBtn);
+    adminControls.appendChild(editBtn);
+    adminControls.appendChild(delBtn);
+    div.appendChild(adminControls);
+  }
+
+  // 닉네임 / 고정
+  const header = document.createElement("div");
+  header.innerHTML = `<strong>${isPinned ? "📌" : (data.nickname || "익명")}</strong>`;
+  div.appendChild(header);
+
+  // 질문 배지 (고정글 제외)
+  if (!isPinned) {
+    const q = document.createElement("div");
+    q.className = "question-chip";
+    const qText = (data.question && String(data.question).trim()) || "질문 미기록";
+    q.textContent = `Q. ${qText}`;
+    div.appendChild(q);
+  }
+
+  // 본문
+  const textDiv = document.createElement("div");
+  textDiv.className = "chat-text preview";
+  textDiv.innerHTML = (data.text || "")
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/~~(.+?)~~/g, '<span style="font-size: 12px; color: #888;">$1</span>')
+    .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>')
+    .replace(/\n/g, "<br>");
+  div.appendChild(textDiv);
+
+  // 고정글: 우측 하단 더보기
+  if (isPinned) {
+    requestAnimationFrame(() => {
+      if (textDiv.scrollHeight > textDiv.clientHeight + 4) {
+        const toggle = makeToggleFor(textDiv);
+        const pinnedFooter = document.createElement("div");
+        pinnedFooter.className = "pinned-footer";
+        pinnedFooter.appendChild(toggle);
+        div.appendChild(pinnedFooter);
+      }
+    });
+  }
+
+  // 일반글 footer
+  if (!isPinned) {
+    const footer = document.createElement("div");
+    footer.className = "card-footer";
+
+    const left = document.createElement("div");
+    left.style.display = "flex";
+    left.style.alignItems = "center";
+    left.style.gap = "4px";
+    left.innerHTML = `
+      <button class="like-button ${liked ? "liked" : ""}" onclick="likeChat('${id}', this)">
+        ${liked ? "💙" : "🤍"}
+      </button>
+      <span class="like-count">${data.likes || 0}</span>
+    `;
+
+    const right = document.createElement("div");
+    right.style.display = "flex";
+    right.style.alignItems = "center";
+    right.style.gap = "8px";
+
+    const timestamp = document.createElement("span");
+    timestamp.className = "timestamp";
+    timestamp.textContent = data.timestamp?.toDate
+      ? new Date(data.timestamp.toDate()).toLocaleString("ko-KR", {
+          year: "numeric", month: "2-digit", day: "2-digit",
+          hour: "2-digit", minute: "2-digit"
+        })
+      : "";
+    right.appendChild(timestamp);
+
+    // 더보기 토글
+    requestAnimationFrame(() => {
+      if (textDiv.scrollHeight > textDiv.clientHeight + 4) {
+        const toggle = makeToggleFor(textDiv);
+        right.appendChild(toggle);
+      }
+    });
+
+    footer.appendChild(left);
+    footer.appendChild(right);
+    div.appendChild(footer);
+  }
+
+  return div;
+}
+
+// ========== 전체 렌더 ==========
+function renderAll() {
+  const box = document.getElementById("chatBox");
+  box.innerHTML = "";
+
+  // 배경색 연속 중복 방지
+  let lastColorIndex = -1;
+
+  // 1) 고정글
+  for (const data of pinnedChats) {
+    const card = buildCard(data, true);
+    box.appendChild(card);
+  }
+
+  // 2) 일반글 (오래된 → 최근)
+  for (const data of normalChats) {
+    const card = buildCard(data, false);
+
+    // 카드 배경색
+    let colorIndex;
+    do {
+      colorIndex = Math.floor(Math.random() * pastelColors.length);
+    } while (colorIndex === lastColorIndex);
+    lastColorIndex = colorIndex;
+    card.style.backgroundColor = pastelColors[colorIndex];
+
+    box.appendChild(card);
+  }
+}
+
+// ========== 데이터 로드: 고정글 ==========
+async function loadPinnedOnce() {
+  if (pinnedChats.length > 0) return; // 이미 읽었으면 스킵
+  const snap = await getDocs(query(collection(db, "chat"), where("pinned", "==", true)));
+  const list = [];
+  snap.forEach(docSnap => list.push({ id: docSnap.id, ...docSnap.data() }));
+  // 시간 오름차순
+  list.sort((a,b) => (a.timestamp?.seconds || 0) - (b.timestamp?.seconds || 0));
+  pinnedChats = list;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+async function loadNextPage() {
+  if (reachedEnd) return;
+
+  // where("pinned","==",false) 제거!
+  let baseQ = query(
+    collection(db, "chat"),
+    orderBy("timestamp", "desc"),
+    limit(PAGE_SIZE)
+  );
+
+  if (lastDocCursor) {
+    baseQ = query(
+      collection(db, "chat"),
+      orderBy("timestamp", "desc"),
+      startAfter(lastDocCursor),
+      limit(PAGE_SIZE)
+    );
+  }
+
+  const snap = await getDocs(baseQ);
+  if (snap.empty) {
+    reachedEnd = true;
+    return;
+  }
+
+  const pageItems = [];
+  snap.forEach(docSnap => pageItems.push({ id: docSnap.id, ...docSnap.data() }));
+
+  // 다음 페이지 커서
+  lastDocCursor = snap.docs[snap.docs.length - 1];
+
+  // pinned 문서는 제외(필드가 없으면 자동으로 falsy → 포함)
+  const onlyNormal = pageItems.filter(d => !d.pinned);
+
+  // 화면은 오래된 → 최근 순서가 자연스러우니 뒤집어서 앞에 붙이기
+  onlyNormal.reverse();
+  normalChats = [...onlyNormal, ...normalChats];
+}
+
+// ========== 상단 도달 시 더 로드 + 스크롤 보정 ==========
+async function onReachTopLoadMore() {
+  if (reachedEnd) return;
+
+  const box = document.getElementById("chatBox");
+  const prevHeight = box.scrollHeight;
+
+  await loadNextPage();
+  renderAll();
+
+  const newHeight = box.scrollHeight;
+  box.scrollTop = newHeight - prevHeight;
+}
+
+// 스크롤 리스너 등록 (맨 위 도달 감지)
+const chatBoxEl = document.getElementById("chatBox");
+let scrolling = false;
+chatBoxEl.addEventListener("scroll", async () => {
+  if (scrolling) return;
+  if (chatBoxEl.scrollTop <= 0) {
+    scrolling = true;
+    await onReachTopLoadMore();
+    scrolling = false;
+  }
+});
+
+
+// 최초 로드(최근 7개만)
+async function initialLoad() {
+  await loadPinnedOnce();  // 고정글 1회 로드
+  await loadNextPage();    // 일반글 첫 페이지(7개)
+  renderAll();
+
+  // 입장 시 가장 최근(맨 아래)로 스크롤
+  const box = document.getElementById("chatBox");
+  box.scrollTop = box.scrollHeight;
+}
+
+// 전체 리로드(등록/수정/삭제/핀 변경 후)
+async function reloadFromScratch() {
+  lastDocCursor = null;
+  reachedEnd = false;
+  normalChats = [];
+  // pinned을 매번 다시 불러오려면 다음 줄 유지, 이미 불렀던 걸 재사용하려면 제거 가능
+  pinnedChats = [];
+
+  await loadPinnedOnce();
+  await loadNextPage();
+  renderAll();
+
+  const box = document.getElementById("chatBox");
+  box.scrollTop = box.scrollHeight;
+}
+
 
 /* ========= 공통 유틸 ========= */
 function makeToggleFor(textDiv) {
@@ -436,193 +718,67 @@ document.getElementById("sendBtn").onclick = async () => {
     await updateDoc(counterRef, { count: count + 1 });
   }
 
-  await addDoc(collection(db, "chat"), {
-    text,
-    question: topicText,
-    timestamp: serverTimestamp(),
-    likes: 0,
-    nickname
-  });
+await addDoc(collection(db, "chat"), {
+  text,
+  question: topicText,
+  timestamp: serverTimestamp(),
+  likes: 0,
+  nickname,
+  pinned: false     // ← 이 줄 추가
+});
+
 
   input.value = "";
-  loadChat();
+await reloadFromScratch();
 };
 
 document.getElementById("editSubmitBtn").onclick = async () => {
   const text = document.getElementById("editInput").value.trim();
   if (!text || !editingId) return;
-  const ref = doc(db, "chat", editingId);
-  await updateDoc(ref, { text });
+
+  await updateDoc(doc(db, "chat", editingId), { text });
   editingId = null;
   document.getElementById("editInput").style.display = "none";
   document.getElementById("editSubmitBtn").style.display = "none";
   document.getElementById("editInput").value = "";
-  loadChat();
+
+  await reloadFromScratch();
 };
 
-/* ========= 채팅 로드 (단일 정의) ========= */
-async function loadChat() {
-  const box = document.getElementById("chatBox");
-  box.innerHTML = "";
-  const snapshot = await getDocs(collection(db, "chat"));
-  let lastColorIndex = -1;
 
-  const chats = [];
-  snapshot.forEach(docSnap => {
-    chats.push({ id: docSnap.id, ...docSnap.data() });
-  });
 
-  // 고정글 먼저
-  chats.sort((a, b) => {
-    if (a.pinned && !b.pinned) return -1;
-    if (!a.pinned && b.pinned) return 1;
-    return (a.timestamp?.seconds || 0) - (b.timestamp?.seconds || 0);
-  });
 
-  for (const data of chats) {
-    const id = data.id;
-    const key = `liked_${id}`;
-    const liked = localStorage.getItem(key) === "true";
 
-    // 카드 배경색 (연속 중복 방지)
-    let colorIndex;
-    do {
-      colorIndex = Math.floor(Math.random() * pastelColors.length);
-    } while (colorIndex === lastColorIndex);
-    lastColorIndex = colorIndex;
 
-    const div = document.createElement("div");
-    div.className = "chat-card";
-    if (data.pinned) div.classList.add("pinned-card");
-    div.style.backgroundColor = pastelColors[colorIndex];
 
-    // 관리자 버튼
-    if (isAdmin) {
-      const adminControls = document.createElement("div");
-      adminControls.style.display = "flex";
-      adminControls.style.justifyContent = "flex-end";
-      adminControls.style.gap = "6px";
-      adminControls.style.marginBottom = "8px";
 
-      const pinBtn = document.createElement("button");
-      pinBtn.className = "admin-button";
-      pinBtn.textContent = data.pinned ? "고정 해제" : "고정";
-      pinBtn.onclick = () => togglePin(id, !!data.pinned);
 
-      const editBtn = document.createElement("button");
-      editBtn.className = "admin-button";
-      editBtn.textContent = "수정";
-      editBtn.onclick = () => editChat(id, data.text.replace(/`/g, "\\`"));
 
-      const delBtn = document.createElement("button");
-      delBtn.className = "admin-button";
-      delBtn.textContent = "삭제";
-      delBtn.onclick = () => deleteChat(id);
 
-      adminControls.appendChild(pinBtn);
-      adminControls.appendChild(editBtn);
-      adminControls.appendChild(delBtn);
-      div.appendChild(adminControls);
-    }
 
-    // 닉네임 / 고정
-    const header = document.createElement("div");
-    header.innerHTML = `<strong>${data.pinned ? "📌" : (data.nickname || "익명")}</strong>`;
-    div.appendChild(header);
 
-    // 질문 배지 (고정글 제외)
-    if (!data.pinned) {
-      const q = document.createElement("div");
-      q.className = "question-chip";
-      const qText = (data.question && String(data.question).trim()) || "질문 미기록";
-      q.textContent = `Q. ${qText}`;
-      div.appendChild(q);
-    }
 
-    // 본문
-    const textDiv = document.createElement("div");
-    textDiv.className = "chat-text preview";
-    textDiv.innerHTML = (data.text || "")
-      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-      .replace(/~~(.+?)~~/g, '<span style="font-size: 12px; color: #888;">$1</span>')
-      .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>')
-      .replace(/\n/g, "<br>");
-    div.appendChild(textDiv);
 
-    /* ===== 고정글: 우측 하단 더보기 ===== */
-    if (data.pinned) {
-      requestAnimationFrame(() => {
-        if (textDiv.scrollHeight > textDiv.clientHeight + 4) {
-          const toggle = makeToggleFor(textDiv);
-          const pinnedFooter = document.createElement("div");
-          pinnedFooter.className = "pinned-footer";
-          pinnedFooter.appendChild(toggle);
-          div.appendChild(pinnedFooter);
-        }
-      });
-    }
 
-    /* ===== 일반 글: footer 오른쪽에 더보기 ===== */
-    if (!data.pinned) {
-      const footer = document.createElement("div");
-      footer.className = "card-footer";
 
-      const left = document.createElement("div");
-      left.style.display = "flex";
-      left.style.alignItems = "center";
-      left.style.gap = "4px";
-      left.innerHTML = `
-        <button class="like-button ${liked ? "liked" : ""}" onclick="likeChat('${id}', this)">
-          ${liked ? "💙" : "🤍"}
-        </button>
-        <span class="like-count">${data.likes || 0}</span>
-      `;
 
-      const right = document.createElement("div");
-      right.style.display = "flex";
-      right.style.alignItems = "center";
-      right.style.gap = "8px";
 
-      const timestamp = document.createElement("span");
-      timestamp.className = "timestamp";
-      timestamp.textContent = data.timestamp?.toDate
-        ? new Date(data.timestamp.toDate()).toLocaleString("ko-KR", {
-            year: "numeric", month: "2-digit", day: "2-digit",
-            hour: "2-digit", minute: "2-digit"
-          })
-        : "";
-      right.appendChild(timestamp);
 
-      // 더보기는 footer가 DOM에 들어간 뒤 높이를 계산해야 하므로 rAF에서 추가
-      requestAnimationFrame(() => {
-        if (textDiv.scrollHeight > textDiv.clientHeight + 4) {
-          const toggle = makeToggleFor(textDiv);
-          right.appendChild(toggle);
-        }
-      });
-
-      footer.appendChild(left);
-      footer.appendChild(right);
-      div.appendChild(footer);
-    }
-
-    document.getElementById("chatBox").appendChild(div);
-  }
-
-  box.scrollTop = box.scrollHeight;
-}
 
 /* ========= 전역 함수 ========= */
 window.deleteChat = async function(id) {
   if (!confirm("삭제할까요?")) return;
   await deleteDoc(doc(db, "chat", id));
-  loadChat();
+  await reloadFromScratch();
 };
+
 window.togglePin = async function(id, currentlyPinned) {
   const ref = doc(db, "chat", id);
   await updateDoc(ref, { pinned: !currentlyPinned });
-  loadChat();
+  pinnedChats = []; // 핀 상태 바뀌면 고정글 목록 초기화
+  await reloadFromScratch();
 };
+
 window.likeChat = async function(id, btn) {
   const key = `liked_${id}`;
   const ref = doc(db, "chat", id);
@@ -668,16 +824,16 @@ document.getElementById("adminBtn").onclick = async () => {
   const snap = await getDoc(doc(db, "admin", "secret"));
   if (!snap.exists()) return alert("비밀번호 데이터 없음");
   const real = snap.data().password;
-  if (pwd === real) {
-    isAdmin = true;
-    loadChat();
-    alert("관리자 권한이 활성화되었습니다.");
-  } else {
-    alert("비밀번호가 틀렸습니다.");
-  }
+if (pwd === real) {
+  isAdmin = true;
+  await reloadFromScratch();   // ← 여기
+  alert("관리자 권한이 활성화되었습니다.");
+} else {
+  alert("비밀번호가 틀렸습니다.");
+}
+
 };
 
-loadChat();
 
 /* ========= 자동 높이 조절 ========= */
 const chatInput = document.getElementById("chatInput");
@@ -735,7 +891,8 @@ function displayVisitorCount(count) {
 }
 
 countVisitor();
-countTodayUploadRequests();
+initialLoad();         // ← 이걸로 교체
+
 </script>
 
 
