@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>민주주의를 위한 자료 모음 💙</title>
+<title>박찬대 당대표 밭갈이 자료 백업</title>
 <style>
   body {
     font-family: "Malgun Gothic", sans-serif;
@@ -225,9 +225,10 @@ function linkify(text){
 </label>
 
 <br/>
-<button onclick="addOrUpdateMessage()">내용 추가</button>
+<button id="addBtn">내용 추가</button>
 
 
+</div>
 
 
 <script type="module">
@@ -618,10 +619,7 @@ function renderKeywordGuide() {
   const keywordStyles = [
 
   { word: "[밭갈이] ", color: "#28a745" }, // 초록색
-  { word: "[정보] ", color: "#6f42c1" },          // 보라색
   { word: "[강찬대] ", color: "#007bff" },          // 파랑색
-  { word: "[박찬대 SNS] ", color: "#dc3545" },          // 빨강색
-  { word: "[박찬대 지지] ", color: "#4B2E2E" },          // 다크브라운
   ];
 
   const container = document.getElementById("keyword-style-guide");
@@ -672,6 +670,17 @@ async function addOrUpdateMessage() {
   if (secretCheckbox) secretCheckbox.checked = false;
   loadMessages();
 }
+window.addOrUpdateMessage = addOrUpdateMessage;
+
+document.addEventListener("DOMContentLoaded", () => {
+  const addButton = document.getElementById("addBtn");
+  if (addButton) {
+    addButton.addEventListener('click', addOrUpdateMessage);
+  }
+});
+
+
+
 
 async function showPasswordPrompt() {
 
@@ -756,7 +765,7 @@ window.setSearchText = setSearchText;
 
 
 
-window.addOrUpdateMessage = addOrUpdateMessage;
+
 window.showPasswordPrompt = showPasswordPrompt;
 function getKSTDateKey() {
   const fmt = new Intl.DateTimeFormat('ko-KR', { timeZone: 'Asia/Seoul', year:'numeric', month:'2-digit', day:'2-digit' });
@@ -768,9 +777,14 @@ function getKSTDateKey() {
 }
 
 window.filterMessages = filterMessages;
-window.onload = () => {
+
+document.addEventListener("DOMContentLoaded", () => {
   loadMessages();
-};
+  const addButton = document.getElementById("addBtn");
+  if (addButton) {
+    addButton.addEventListener('click', addOrUpdateMessage);
+  }
+});
 
 
 
