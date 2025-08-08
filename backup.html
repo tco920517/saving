@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>민주주의를 위한 자료 모음 💙</title>
+<style>
+  body {
+    font-family: "Malgun Gothic", sans-serif;
+    background-color: #f2f5f8;
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+  }
+  .page-title {
+    max-width: 700px;
+    margin: 25px auto 20px;
+    text-align: center;
+    padding: 0 15px;
+    line-height: 1.6;
+    user-select: text;
+  }
+  .page-title .main-title {
+    font-size: 20px;
+    font-weight: bold;
+  }
+  .page-title .sub-title {
+    font-size: 13px;
+    font-weight: normal;
+  }
+.chat-container {
+  width: 100%;
+  max-width: 500px;
+  height: 600px;          /* 기본 고정 높이 */
+  max-height: 75vh;       /* 작은 화면 대응 */
+  overflow-y: auto;
+  margin: 0 auto;
+  padding: 10px;
+  background-color: #e0f3ff;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
+}
+
+  
+.chat-card {
+  max-width: 100%;
+  padding: 16px;
+  margin: 5px auto;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  font-size: 14px;
+  line-height: 1.6;
+  position: relative;
+  word-wrap: break-word;
+  box-sizing: border-box;
+  text-align: left;}
+  .timestamp {
+    font-size: 12px;
+    color: #888;
+    text-align: right;
+    margin-top: 4px;
+  }
+  .bubble-buttons {
+    display: none;
+    font-size: 12px;
+    margin-top: 6px;
+    text-align: right;
+  }
+  .search-bar, #input-area, #admin-panel {
+    max-width: 500px;
+    margin: 20px auto;
+    text-align: center;
+  }
+  .search-bar input {
+    width: 100%;
+    max-width: 333px;
+    margin: 0 auto;
+    display: block;
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+  }
+  button {
+    margin-top: 10px;
+    padding: 6px 12px;
+    font-size: 14px;
+    border-radius: 8px;
+    border: none;
+    background-color: #aaa;
+    color: white;
+    cursor: pointer;
+  }
+  button:hover {
+    background-color: #888;
+  }
+  #toast {
+    display: none;
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    opacity: 0.9;
+    z-index: 1000;
+  }
+  .chat-content.preview .inner-text {
+    max-height: 6em;
+    overflow: hidden;
+  }
+  .chat-content.expanded .inner-text {
+    max-height: none;
+  }
+.chat-content .inner-text {
+  transition: max-height 0.3s ease;
+  user-select: text;
+  font-size: 12px; /* 본문 내용 폰트 크기 */
+}
+.chat-content .inner-text strong:not(.prefix-tag) {
+  margin-bottom: 0;
+  display: inline;         /* 인라인 요소로 강제 */
+  line-height: normal;     /* 라인 박스 높이 최소화 */
+}
+
+.chat-content .inner-text > strong {
+  font-size: 14px;
+  display: inline-block;
+  margin-bottom: 16px;
+  /* 밑줄 제거 */
+}
+
+/* 말머리에만 선 적용 */
+.prefix-tag {
+  border-bottom: 1px dashed #ccc;
+  padding-bottom: 2px;
+}
+
+
+
+@keyframes sparkle {
+  0%   { opacity: 1; text-shadow: 0 0 5px #3399ff; }
+  50%  { opacity: 0.6; text-shadow: 0 0 12px #66ccff; }
+  100% { opacity: 1; text-shadow: 0 0 5px #3399ff; }
+}
+.sparkling-text {
+  animation: sparkle 1.5s infinite;
+  font-weight: bold;
+  color: #007bff;
+}
+</style>
+
+<script>
+function escapeHTML(s){
+  return String(s).replace(/[&<>"']/g, function(m){
+    return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m]);
+  });
+}
+function linkify(text){
+  const escaped = escapeHTML(text || "");
+  return escaped.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+}
+</script>
+
+</head>
+<body>
+<div id="toast">📋 복사</div>
+<div style="text-align: center;">
+  <div style="font-size: 14px; color: #000000; font-weight: bold;">
+</br>
+<div style="text-align:center; font-size:20px; margin-bottom:10px;">
+  <strong class="sparkling-text">박찬대 당대표 선거 백업용 페이지</strong>
+</div>
+    참고용 소제목 <small>(클릭하면 입력됨)</small>
+  </div>
+  <div style="font-size: 12px; font-weight: bold;">
+    <span style="color: #28a745; margin-right: 10px; cursor: pointer;" onclick="setSearchText('[밭갈이]')">[밭갈이]</span>
+    <span style="color: #007bff; margin-right: 10px; cursor: pointer;" onclick="setSearchText('[강찬대]')">[강찬대]</span>
+  </div>
+</div>
+</br>
+<div class="chat-container" id="chatBox"></div>
+<div class="search-bar" style="display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
+  <select id="prefixFilter" onchange="filterMessages()" 
+    style="flex: 0 0 auto; max-width: 120px; padding: 8px 12px; font-size: 14px; border: 1px solid #ccc; border-radius: 8px;">
+    <option value="">전체 보기</option>
+    <option value="📣 박찬대 SNS">📣 박찬대 SNS</option>
+    <option value="🔔 지지선언">🔔 지지선언</option>
+    <option value="🍀 추천 방송">🍀 추천 방송</option>
+<option value="💬 기타">💬 기타</option>
+
+  </select>
+  <input id="searchInput" oninput="filterMessages()" placeholder="내용 검색" type="text"
+    style="flex: 1 1 auto; min-width: 0; padding: 8px 12px; font-size: 14px; font-family: 'Malgun Gothic', sans-serif; border: 1px solid #ccc; border-radius: 8px; max-width: 340px;" />
+</div>
+<div id="admin-panel" style="display: flex; justify-content: center; gap: 10px;">
+
+  <button onclick="showPasswordPrompt()">🔒 관리자 전용</button>
+</div>
+<hr style="margin: 20px 0; border: none; border-top: 1px solid #ccc;" />
+
+
+
+<div id="input-area" style="display:none;">
+<div id="keyword-style-guide" style="margin-bottom: 12px; font-size: 13px; text-align: left;"></div>
+
+<select id="prefix" style="width: 100%; max-width: 500px; margin-bottom: 8px; padding: 6px; font-size: 14px;">
+  <option value="">전체 보기</option>
+  <option value="📣 박찬대 SNS">📣 박찬대 SNS</option>
+  <option value="🔔 지지선언">🔔 지지선언</option>
+  <option value="🍀 추천 방송">🍀 추천 방송</option>
+  <option value="💬 기타">💬 기타</option>
+<option value="🔑 관리자 전용">🔑 관리자 전용</option>
+</select>
+
+<textarea id="newMessage" placeholder="내용" rows="3" style="width: 100%; height: 160px; box-sizing: border-box; overflow-y: auto;font-family: 'Malgun Gothic', sans-serif;"></textarea>
+
+<label style="display:block; margin-top:6px; font-size:13px;">
+  <input type="checkbox" id="secretCheckbox"> 비밀글
+</label>
+
+<br/>
+<button onclick="addOrUpdateMessage()">내용 추가</button>
+
+
+
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  addDoc,
+  deleteDoc,
+  updateDoc,
+  doc,
+  getDoc,
+  setDoc,
+  serverTimestamp,
+  query,
+  orderBy
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const firebaseConfig = {
+  apiKey: "AIzaSyAZHqkGXdH4XxL-0jprA2DB7YO4XhTdNmQ",
+  authDomain: "chat-page-6d547.firebaseapp.com",
+  projectId: "chat-page-6d547",
+  storageBucket: "chat-page-6d547.appspot.com",
+  messagingSenderId: "1087235341754",
+  appId: "1:1087235341754:web:6583340a62f21068b5b183"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+let isAdmin = false;
+let editingId = null;
+
+const pastelColors = [
+  '#fffefe', // 거의 흰색 핑크기
+  '#fffef9', // 크림기 있는 흰색
+  '#fafdff', // 매우 흐린 하늘색
+  '#f9fffc', // 연한 민트빛 흰색
+  '#fefbff', // 흐린 라벤더 흰색
+  '#fffcf9', // 아이보리 느낌의 흰색
+  '#fefeff'  // 거의 퓨어 화이트
+];
+
+
+
+async function loadMessages() {
+  let lastColorIndex = -1;
+  const container = document.getElementById("chatBox");
+const previousScrollTop = container.scrollTop;
+  container.innerHTML = "";
+
+  const q = query(collection(db, "backup"), orderBy("timestamp", "asc"));
+  
+    function copyTextToClipboard(text) {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.setAttribute("readonly", "");
+      textarea.style.position = "absolute";
+      textarea.style.left = "-9999px";
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand("copy");
+        const toast = document.getElementById("toast");
+        toast.style.display = "block";
+        setTimeout(() => toast.style.display = "none", 1500);
+      } catch (err) {
+        console.error("복사 실패", err);
+      }
+      document.body.removeChild(textarea);
+    }
+  
+  const snapshot = await getDocs(q);
+  snapshot.forEach(docSnap => {
+    const data = docSnap.data();
+    const id = docSnap.id;
+// 🔒 비밀글은 관리자만 보이게
+if (data.secret === true && !isAdmin) return;
+
+
+    const msg = data.content;
+    const prefix = data.prefix || "";
+const ts = data.timestamp ? data.timestamp.toDate() : new Date();
+const yearShort = String(ts.getFullYear()).slice(2); 
+const dateOnly = yearShort + '-' + String(ts.getMonth()+1).padStart(2, '0') + '-' + String(ts.getDate()).padStart(2, '0');
+
+const bubble = document.createElement("div");
+bubble.className = "chat-card";
+let colorIndex;
+do {
+  colorIndex = Math.floor(Math.random() * pastelColors.length);
+} while (colorIndex === lastColorIndex);
+lastColorIndex = colorIndex;
+
+bubble.style.backgroundColor = pastelColors[colorIndex];
+
+// 비밀글이면 🔒 표시 추가
+if (data.secret === true) {
+  const lockIcon = document.createElement("div");
+  lockIcon.textContent = "🔒";
+  lockIcon.style.cssText = `
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 16px;
+  `;
+  bubble.appendChild(lockIcon);
+}
+
+const contentDiv = document.createElement("div");
+
+
+    contentDiv.className = "chat-content preview";
+    const inner = document.createElement("div");
+    inner.className = "inner-text";
+
+
+const keywordStyles = [
+  { word: "[밭갈이]", color: "#28a745" }, // 초록색
+  { word: "[강찬대]", color: "#007bff" },          // 보라색
+];
+
+function escapeRegExp(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+let highlightedMsg = msg;
+keywordStyles.forEach(({ word, color }) => {
+  const regex = new RegExp(escapeRegExp(word), 'g');
+  highlightedMsg = highlightedMsg.replace(
+    regex,
+    `<span style="font-weight: bold; color: ${color}; font-size: 13px;">${word}</span>`
+  );
+});
+
+
+
+let formattedMsg = "";
+
+if (prefix === "💬채팅용 한 줄(랜덤 복사)") {
+  const lines = highlightedMsg.split('\n');
+  formattedMsg = lines.map((line, idx) => {
+    const color = idx % 2 === 0 ? '#000000' : '#888888'; // 홀수 줄 검정, 짝수 줄 회색
+    return `<span style="color: ${color};">${line}</span>`;
+  }).join('<br>');
+} else {
+  formattedMsg = highlightedMsg
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/~~(.+?)~~/g, '<span style="font-size: 12px; color: #888;">$1</span>')
+    .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank">$1</a>')
+    .replace(/\n/g, '<br>');
+}
+
+
+
+
+inner.innerHTML = `${prefix ? `<strong class="prefix-tag">${prefix}</strong><br>` : ""}` + formattedMsg;
+
+
+
+
+
+
+    const toggle = document.createElement("div");
+    toggle.className = "toggle-more";
+    toggle.textContent = "더보기";
+    toggle.style.cssText = "text-align:right; font-size:12px; color:gray; cursor:pointer;";
+    toggle.addEventListener("click", (event) => {
+      event.stopPropagation();
+      contentDiv.classList.toggle("expanded");
+      toggle.textContent = contentDiv.classList.contains("expanded") ? "줄이기" : "더보기";
+    });
+    contentDiv.appendChild(inner);
+    requestAnimationFrame(() => {
+      const oldToggle = contentDiv.querySelector(".toggle-more");
+      if (oldToggle) oldToggle.remove();
+      const isOverflowed = inner.scrollHeight > inner.clientHeight + 4;
+      if (isOverflowed) {
+        const toggle = document.createElement("div");
+        toggle.className = "toggle-more";
+        toggle.textContent = "더보기";
+        toggle.style.cssText = "text-align:right; font-size:12px; color:gray; cursor:pointer;";
+        toggle.addEventListener("click", (event) => {
+          event.stopPropagation();
+          contentDiv.classList.toggle("expanded");
+          toggle.textContent = contentDiv.classList.contains("expanded") ? "줄이기" : "더보기";
+        });
+        contentDiv.appendChild(toggle);
+      }
+    });
+    const copyBtn = document.createElement("button");
+    copyBtn.textContent = "복사";
+    copyBtn.style.cssText = "position: absolute; bottom: 5px; left: 10px; font-size: 12px; padding: 4px 8px; border-radius: 6px; background-color: #eee; color: #000; border: none; cursor: pointer;";
+
+
+
+
+
+
+
+
+copyBtn.onclick = () => {
+  let raw = inner.innerText.trim();
+
+  // 말머리 제거
+  if (
+    raw.startsWith("📣") ||
+    raw.startsWith("🔔") ||
+    raw.startsWith("🍀") ||
+    raw.startsWith("🔑") ||
+    raw.startsWith("💬")
+  ) {
+    raw = raw.substring(raw.indexOf("\n") + 1).trim();
+  }
+
+  // 💬채팅용 한 줄인 경우: 한 줄만 랜덤으로 복사
+
+
+if (prefix === "💬채팅용 한 줄(랜덤 복사)") {
+  const lines = raw.split("\n").filter(line => line.trim() !== "");
+  if (lines.length > 0) {
+    raw = lines[Math.floor(Math.random() * lines.length)];
+  }
+}
+
+
+  const textarea = document.createElement("textarea");
+  textarea.value = raw;
+  textarea.setAttribute("readonly", "");
+  textarea.style.position = "absolute";
+  textarea.style.left = "-9999px";
+  document.body.appendChild(textarea);
+  textarea.select();
+  try {
+    document.execCommand("copy");
+    const toast = document.getElementById("toast");
+    toast.style.display = "block";
+    setTimeout(() => toast.style.display = "none", 1500);
+  } catch (err) {
+    console.error("복사 실패", err);
+  }
+  document.body.removeChild(textarea);
+};
+
+
+
+
+
+
+
+
+
+
+    contentDiv.appendChild(copyBtn);
+    bubble.appendChild(contentDiv);
+    const tsDiv = document.createElement("div");
+    tsDiv.className = "timestamp";
+    tsDiv.textContent = dateOnly;
+    bubble.appendChild(tsDiv);
+    if (isAdmin) {
+      const btns = document.createElement("div");
+      btns.className = "bubble-buttons";
+      btns.style.display = "block";
+      const editBtn = document.createElement("button");
+      editBtn.textContent = "수정";
+
+
+editBtn.onclick = () => {
+  document.getElementById("newMessage").value = msg;
+  document.getElementById("prefix").value = prefix;
+  const scb = document.getElementById("secretCheckbox");
+  if (scb) scb.checked = !!data.secret;  // 🔒 비밀글 상태 반영
+  editingId = id;
+};
+
+
+
+const delBtn = document.createElement("button");
+delBtn.textContent = "삭제";
+delBtn.onclick = async () => {
+  const ok = confirm("정말 삭제하시겠습니까?");
+  if (!ok) return; 
+  await deleteDoc(doc(db, "backup", id));
+  loadMessages();
+};
+      btns.appendChild(editBtn);
+      btns.appendChild(delBtn);
+      bubble.appendChild(btns);
+    }
+    container.appendChild(bubble);
+  });
+
+filterMessages(); 
+container.scrollTop = container.scrollHeight;
+
+
+if (isAdmin) {
+  const visitorContainer = document.getElementById("visitor-messages");
+  if (visitorContainer) {
+    const visitorSnap = await getDocs(query(collection(db, "visitor_requests"), orderBy("timestamp", "desc")));
+    visitorSnap.forEach(docSnap => {
+      const data = docSnap.data();
+      const ts = data.timestamp ? data.timestamp.toDate() : new Date();
+const id = docSnap.id;
+const dateOnly = `${String(ts.getFullYear()).slice(2)}-${String(ts.getMonth()+1).padStart(2, '0')}-${String(ts.getDate()).padStart(2, '0')} ${String(ts.getHours()).padStart(2, '0')}:${String(ts.getMinutes()).padStart(2, '0')}`;
+      const bubble = document.createElement("div");
+      bubble.className = "chat-card";
+      bubble.style.backgroundColor = "#fff4e6";
+bubble.style.position = "relative";
+if (isAdmin) {
+  const delBtn = document.createElement("div");
+  delBtn.textContent = "❌";
+  delBtn.style.cssText = `
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    cursor: pointer;
+    font-size: 14px;
+    color: red;
+  `;
+  delBtn.title = "삭제";
+delBtn.onclick = async () => {
+  const ok = confirm("정말 삭제하시겠습니까?");
+  if (!ok) return;
+  await deleteDoc(doc(db, "visitor_requests", id));
+  bubble.remove(); 
+};
+  bubble.appendChild(delBtn);
+}      
+
+
+const content = document.createElement("div");
+content.className = "chat-content";
+
+// 링크 자동 변환 및 줄바꿈
+
+
+const linkifiedContent = data.content
+  .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" style="color:#1a0dab; text-decoration: underline;">$1</a>')  // 수정됨
+  .replace(/\n/g, "<br>");
+
+
+
+content.innerHTML = `<strong>📩 방문자 메시지</strong><br><div class="inner-text">${linkifiedContent}</div>`;
+
+// 복사 버튼 추가
+const copyBtn = document.createElement("button");
+copyBtn.textContent = "복사";
+copyBtn.style.cssText = "position: absolute; bottom: 5px; left: 10px; font-size: 12px; padding: 4px 8px; border-radius: 6px; background-color: #eee; color: #000; border: none; cursor: pointer;";
+
+copyBtn.onclick = () => {
+  const rawText = data.content.trim();
+  const textarea = document.createElement("textarea");
+  textarea.value = rawText;
+  textarea.setAttribute("readonly", "");
+  textarea.style.position = "absolute";
+  textarea.style.left = "-9999px";
+  document.body.appendChild(textarea);
+  textarea.select();
+  try {
+    document.execCommand("copy");
+    const toast = document.getElementById("toast");
+    toast.style.display = "block";
+    setTimeout(() => (toast.style.display = "none"), 1500);
+  } catch (err) {
+    console.error("복사 실패", err);
+  }
+  document.body.removeChild(textarea);
+};
+
+bubble.appendChild(copyBtn);
+
+
+
+
+
+
+
+      const tsDiv = document.createElement("div");
+      tsDiv.className = "timestamp";
+      tsDiv.textContent = dateOnly;
+      bubble.appendChild(content);
+      bubble.appendChild(tsDiv);
+      visitorContainer.appendChild(bubble);
+    });
+  }
+}}
+function renderKeywordGuide() {
+  const keywordStyles = [
+
+  { word: "[밭갈이] ", color: "#28a745" }, // 초록색
+  { word: "[정보] ", color: "#6f42c1" },          // 보라색
+  { word: "[강찬대] ", color: "#007bff" },          // 파랑색
+  { word: "[박찬대 SNS] ", color: "#dc3545" },          // 빨강색
+  { word: "[박찬대 지지] ", color: "#4B2E2E" },          // 다크브라운
+  ];
+
+  const container = document.getElementById("keyword-style-guide");
+  if (!container) return;
+
+  const html = keywordStyles.map(({ word, color }) =>
+    `<span 
+       style="color: ${color}; font-weight: bold; margin-right: 8px; cursor: pointer;" 
+       onclick="insertKeyword('${word}')"
+     >${word}</span>`
+  ).join(" ");
+
+  container.innerHTML = `<div style="margin-bottom: 4px;"><strong>✅ 강조 단어 미리보기:</strong></div>${html}`;
+}
+
+
+// ✅ 말머리 선택 시 자동으로 secret 체크
+document.getElementById("prefix").addEventListener("change", function () {
+  const selected = this.value;
+  const secretCheckbox = document.getElementById("secretCheckbox");
+  if (!secretCheckbox) return;
+
+  if (selected === "🔑 관리자 전용") {
+    secretCheckbox.checked = true;
+    secretCheckbox.disabled = true; // 강제 적용되도록 비활성화
+  } else {
+    secretCheckbox.disabled = false;
+  }
+});
+
+
+
+async function addOrUpdateMessage() {
+  const content = document.getElementById("newMessage").value.trim();
+  const prefix = document.getElementById("prefix").value;
+  const secretCheckbox = document.getElementById("secretCheckbox");
+  const secret = secretCheckbox ? secretCheckbox.checked : false;
+  if (!content) return;
+
+  if (editingId) {
+    await updateDoc(doc(db, "backup", editingId), { content, prefix, secret });
+    editingId = null;
+  } else {
+    await addDoc(collection(db, "backup"), { content, prefix, secret, timestamp: serverTimestamp() });
+  }
+
+  document.getElementById("newMessage").value = "";
+  if (secretCheckbox) secretCheckbox.checked = false;
+  loadMessages();
+}
+
+async function showPasswordPrompt() {
+
+  const pwd = prompt("비밀번호를 입력하세요");
+  if (!pwd) return;
+  try {
+    const docRef = doc(db, "admin", "secret");
+    const docSnap = await getDoc(docRef);
+    if (!docSnap.exists()) {
+      alert("비밀번호 데이터가 존재하지 않습니다.");
+      return;
+    }
+    const realPassword = docSnap.data().password;
+    if (pwd === realPassword) {
+      isAdmin = true;
+
+// ✅ 여기 추가
+  const prefixFilter = document.getElementById("prefixFilter");
+  if (prefixFilter && ![...prefixFilter.options].some(opt => opt.value === "🔑 관리자 전용")) {
+    const adminOpt = document.createElement("option");
+    adminOpt.value = "🔑 관리자 전용";
+    adminOpt.textContent = "🔑 관리자 전용";
+    prefixFilter.appendChild(adminOpt);
+  }
+
+  document.getElementById("input-area").style.display = "block";
+  renderKeywordGuide();
+  loadMessages();
+} else {
+  alert("비밀번호가 틀렸습니다.");
+}
+  } catch (error) {
+    console.error("비밀번호 확인 중 오류 발생:", error);
+    alert("오류가 발생했습니다.");
+  }
+}
+
+
+
+
+
+function filterMessages() {
+  const queryText = document.getElementById("searchInput").value.toLowerCase().trim();
+  const selectedPrefix = document.getElementById("prefixFilter")?.value || "";
+  const bubbles = document.querySelectorAll(".chat-card");
+
+  // 검색어를 공백 기준으로 분리
+  const searchTokens = queryText.split(/\s+/).filter(Boolean);
+
+  bubbles.forEach(b => {
+    const text = b.textContent.toLowerCase();
+    const prefixMatch = selectedPrefix === "" || text.includes(selectedPrefix.toLowerCase());
+
+    // 입력된 단어들이 순서대로 포함되어 있는지 확인
+    let lastIndex = -1;
+    let textMatch = true;
+    for (const token of searchTokens) {
+      const index = text.indexOf(token, lastIndex + 1);
+      if (index === -1) {
+        textMatch = false;
+        break;
+      }
+      lastIndex = index;
+    }
+
+    b.style.display = (prefixMatch && textMatch) ? "block" : "none";
+  });
+
+  const container = document.getElementById("chatBox");
+  container.scrollTop = container.scrollHeight;
+}
+
+
+function setSearchText(text) {
+  const input = document.getElementById("searchInput");
+  if (!input) return;
+  input.value = text;
+  filterMessages();
+}
+window.setSearchText = setSearchText;
+
+
+
+
+window.addOrUpdateMessage = addOrUpdateMessage;
+window.showPasswordPrompt = showPasswordPrompt;
+function getKSTDateKey() {
+  const fmt = new Intl.DateTimeFormat('ko-KR', { timeZone: 'Asia/Seoul', year:'numeric', month:'2-digit', day:'2-digit' });
+  const parts = fmt.formatToParts(new Date());
+  const y = parts.find(p=>p.type==='year').value;
+  const m = parts.find(p=>p.type==='month').value;
+  const d = parts.find(p=>p.type==='day').value;
+  return `${y}-${m}-${d}`;
+}
+
+window.filterMessages = filterMessages;
+window.onload = () => {
+  loadMessages();
+};
+
+
+
+
+window.submitVisitorMessage = async function() {
+  const content = document.getElementById("visitorMessage").value.trim();
+  if (!content) return alert("메시지를 입력해주세요.");
+  try {
+    await addDoc(collection(db, "visitor_requests"), {
+      content,
+      timestamp: serverTimestamp()
+    });
+    alert("전송 완료. 수동 업데이트이니 조금만 기다려 주세요.");
+    document.getElementById("visitorMessage").value = "";
+    document.getElementById("visitor-message-box").style.display = "none";
+  } catch (e) {
+    console.error("전송 실패", e);
+    alert("전송 실패");
+  }
+};
+document.getElementById("uploadRequestBtn").onclick = () => {
+  const box = document.getElementById("visitor-message-box");
+  box.style.display = box.style.display === "none" ? "flex" : "none";
+};
+async function countTodayUploadRequests() {
+  const todayKey = getKSTDateKey(); // YYYY-MM-DD
+  const start = new Date(`${todayKey}T00:00:00+09:00`);
+  const end = new Date(`${todayKey}T23:59:59+09:00`);
+
+  const q = query(collection(db, "visitor_requests"));
+  const snapshot = await getDocs(q);
+
+  let count = 0;
+  snapshot.forEach(docSnap => {
+    const ts = docSnap.data().timestamp?.toDate();
+    if (ts && ts >= start && ts <= end) {
+      count++;
+    }
+  });
+function insertKeyword(word) {
+  const textarea = document.getElementById("newMessage");
+  if (!textarea) return;
+
+  // 커서 위치
+  const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+
+  // 기존 내용
+  const text = textarea.value;
+
+  // 삽입
+  const before = text.substring(0, start);
+  const after = text.substring(end);
+
+  // 갱신
+  textarea.value = before + word + after;
+
+  // 커서 위치 업데이트
+  textarea.focus();
+  textarea.selectionStart = textarea.selectionEnd = start + word.length;
+}
+window.insertKeyword = insertKeyword;
+
+
+  const countDiv = document.getElementById("upload-count");
+  if (countDiv) {
+    countDiv.textContent = `오늘 업로드 요청: ${count.toLocaleString()}건`;
+  }
+}
+
+</script>
+
+</body>
+</html>
