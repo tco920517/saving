@@ -191,6 +191,7 @@ function linkify(text){
     <option value="">전체 보기</option>
     <option value="📣 박찬대 SNS">📣 박찬대 SNS</option>
     <option value="🔔 지지선언">🔔 지지선언</option>
+    <option value="✔ 팩트체크">✔ 팩트체크</option>
     <option value="🍀 추천 방송">🍀 추천 방송</option>
 <option value="💬 기타">💬 기타</option>
 
@@ -213,7 +214,9 @@ function linkify(text){
   <option value="">전체 보기</option>
   <option value="📣 박찬대 SNS">📣 박찬대 SNS</option>
   <option value="🔔 지지선언">🔔 지지선언</option>
+  <option value="✔ 팩트체크">✔ 팩트체크</option>
   <option value="🍀 추천 방송">🍀 추천 방송</option>
+
   <option value="💬 기타">💬 기타</option>
 <option value="🔑 관리자 전용">🔑 관리자 전용</option>
 </select>
@@ -436,6 +439,8 @@ copyBtn.onclick = () => {
   if (
     raw.startsWith("📣") ||
     raw.startsWith("🔔") ||
+
+    raw.startsWith("✔") ||
     raw.startsWith("🍀") ||
     raw.startsWith("🔑") ||
     raw.startsWith("💬")
